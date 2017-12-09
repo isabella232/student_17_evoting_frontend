@@ -74,15 +74,15 @@ function display_election_full(election){
 
 	$("#div1").append("<h2>"+election.name+"</h2>");
 	if(election.creator != null){
-	$("#div1").append("<p>Created by : "+election.creator+"</p>");
+		$("#div1").append("<p>Created by : "+election.creator+"</p>");
 	}
 
 	if(election.end != null){
-	$("#div1").append("<p>Deadline : "+election.end+"</p>");
+		$("#div1").append("<p>Deadline : "+election.end+"</p>");
 	}
 
 	if(election.description != null){
-	$("#div1").append("<p>Description : "+election.description+"</p>");
+		$("#div1").append("<p>Description : "+election.description+"</p>");
 	}
 }
 
