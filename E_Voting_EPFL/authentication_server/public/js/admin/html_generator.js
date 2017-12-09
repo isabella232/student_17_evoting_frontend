@@ -3,6 +3,10 @@
 * Contains all the methods that allows to inject HTML in the document.
 */
 
+const red = "#ff0707";
+const green = "#30f209";
+const grey = "#b2a0a0";
+
 /**
 * Inject the banner with the EPFL logo and the name of the application.
 */
@@ -73,16 +77,34 @@ function display_election_full(election){
 	clearDisplay();	
 
 	$("#div1").append("<h2>"+election.name+"</h2>");
+
+	$("#div1").append(createDiv("details"));
+
 	if(election.creator != null){
-		$("#div1").append("<p>Created by : "+election.creator+"</p>");
+		$("#details").append(paragraph("Created by  : "+election.creator));
 	}
 
 	if(election.end != null){
-		$("#div1").append("<p>Deadline : "+election.end+"</p>");
+		$("#details").append(paragraph("Deadline    : "+election.end));
 	}
 
 	if(election.description != null){
-		$("#div1").append("<p>Description : "+election.description+"</p>");
+		$("#details").append(paragraph("Description : "+election.description));
+	}
+
+	if(create_date_from_string(election.end) >= new Date()){
+		//End date not reached yet
+		$("#div1").append(unclickableButton("Voting", green));
+		$("#div1").append(unclickableButton("Shuffle", grey));
+		$("#div1").append(unclickableButton("Finalize", grey));
+		$("#div1").append(paragraph("The election end date is not reached yet, the voters can still vote."));
+	}else{
+		//End date reached
+		$("#div1").append(unclickableButton("Voting", red));
+		$("#div1").append(unclickableButton("Shuffle", green));
+		$("#div1").append(unclickableButton("Finalize", grey));
+		//Have to check if the election have already been shuffled or not.
+		$("#div1").append(paragraph("The election is now over, you can now shuffle and finalize the election."));
 	}
 }
 
@@ -117,30 +139,38 @@ function display_election_creation(){
 	$("#div1").append(paragraph("Please note that only people with an administrator status are authorized to create an election."));
 	$("#div1").append("<form>");
 	$("#div1").append("Election name :<br>");
-	$("#div1").append("<input type='text' name='name'><br><br>");
+	$("#div1").append("<input type='text' name='name' placeholder='name'><br><br>");
 	$("#div1").append("Deadline : <br>");
-	$("#div1").append("<input type='text' name='deadline'><br><br>");
+	$("#div1").append("<input type='text' name='deadline' placeholder='DD/MM/YYYY'><br><br>");
 	$("#div1").append("Description :<br>");
-	$("#div1").append("<textarea name='description' cols='40' rows='5'></textarea><br><br>");
+	$("#div1").append("<textarea name='description' cols='40' rows='5' placeholder='Add a description'></textarea><br><br>");
 	$("#div1").append("Participants :<br>");
-	$("#div1").append("<textarea name='participants' cols='40' rows='5'></textarea><br><br>");
+	$("#div1").append("<textarea name='participants' cols='40' rows='5' placeholder='Write one sciper per line'></textarea><br><br>");
 	$("#div2").append("</form>");
 
 	$("#div2").append(clickableElement("button", "Finish", function(){
 		var errors = false;
-		var name = $("input[type='text'][name='name']").val();
+		$("#errDiv").empty();
+
+		var name = $("input[type='text'][name='Name']").val();
+
 		var deadline = $("input[type='text'][name='deadline']").val();
+		if(!verify_valid_date(deadline)){
+			$("#errDiv").append(paragraph("The date is in a wrong format."));
+			errors = true;
+		}
+		
 		var description = $("textarea[name='description']").val();
 
 		var participants_string = ($("textarea[name='participants']").val()).split('\n');
 		console.log(participants_string);
 		var participants = [];
-		$("#errDiv").empty();
+
 		for(var i = 0; i < participants_string.length; i++){
 			if(verify_valid_sciper(participants_string[i])){
 				participants[i] = Number(participants_string[i]);
 			}else{
-				$("#errDiv").append(paragraph("The participant number "+i+" is not well written."));
+				$("#errDiv").append(paragraph("The participant number "+(i+1)+" is not well written."));
 				errors = true;
 			}
 		}		
@@ -152,9 +182,39 @@ function display_election_creation(){
 
 }
 
+/**
+* Verify if a given string representing a SCIPER number is in the good format (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+* @param String sciper : the string to verify.
+* @return true if the given sciper matches the requirements, false otherwise.
+*/
 function verify_valid_sciper(sciper){
-	var regex = /(\d+\d+\d+\d+\d+\d)/;
+	var regex = /(\d\d\d\d\d\d)/;
 	return sciper.length == 6 && sciper.match(regex);
+}
+
+/**
+* Verify if a given string representing a date is in the good format (DD/MM/YYYY).
+* @param String date : the string to verify.
+* @return true if the given string matches the requirements, false otherwise
+*/
+function verify_valid_date(date){
+	var regex = /(\d\d\/\d\d\/\d\d\d\d)/;
+	return date.length == 10 && date.match(regex);
+}
+
+/**
+* Create a Date from the given string (which should be in the DD/MM/YYYY format).
+* @param String string : the string to convert into a date.
+* @return Date : a date from the given representation, null if the representation wasn't in a good format.
+*/
+function create_date_from_string(string){
+	if(verify_valid_date(string)){
+		var splitted = string.split('/');
+		return new Date(Number(splitted[2]), 
+			Number(splitted[1]), Number(splitted[0]), 0, 0, 0, 0);
+	}else{
+		return null;
+	}
 }
 
 /**

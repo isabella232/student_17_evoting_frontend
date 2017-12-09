@@ -16,6 +16,19 @@ function clickableElement(elementType, textToDisplay, onClick){
     element.addEventListener("click", onClick);
     return element;
 }
+/**
+* Create a division with the given ID and a text alignment set to left.
+* @param id : the id of the new division.
+* @return HTML Element : a division with the given id.
+*/
+function createDiv(id){
+	var element = document.createElement("div");
+	element.id = id;
+	element.style.textAlign = "left";
+	element.style.width = "30%";
+	element.style.margin = "0 auto";
+	return element;
+}
 
 /**
 * Return a paragraph element with the given text.

@@ -18,6 +18,36 @@ function clickableElement(elementType, textToDisplay, onClick){
 }
 
 /**
+* Create an unclickable button.
+* @param String textToDisplay : the text to display on the button.
+* @param String color : the hex representation of the color of the button.
+* @return HTML Element : an unclickable button with the given text insight.
+*/
+function unclickableButton(textToDisplay, color){
+	var element = document.createElement("button");
+	element.innerHTML = textToDisplay;
+	element.disabled = "disabled";
+	element.style.backgroundColor = color;
+	element.style.height = "50px";
+	element.style.color = "#000000";
+	return element;
+}
+
+/**
+* Create a division with the given ID and a text alignment set to left.
+* @param id : the id of the new division.
+* @return HTML Element : a division with the given id.
+*/
+function createDiv(id){
+	var element = document.createElement("div");
+	element.id = id;
+	element.style.textAlign = "left";
+	element.style.width = "30%";
+	element.style.margin = "0 auto";
+	return element;
+}
+
+/**
 * Return a paragraph element with the given text.
 * @param String textToDisplay : the text to display in the paragraph.
 * @return HTMLParagraphElement an element representing a paragraph with the given text.

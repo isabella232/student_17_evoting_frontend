@@ -70,31 +70,40 @@ function display_election_full(election){
 	clearDisplay();	
 
 	$("#div1").append("<h2>"+election.name+"</h2>");
+
+	$("#div1").append(createDiv("details"));
+
 	if(election.creator != null){
-	$("#div1").append("<p>Created by : "+election.creator+"</p>");
+		$("#details").append(paragraph("Created by  : "+election.creator));
 	}
 
 	if(election.end != null){
-	$("#div1").append("<p>Deadline : "+election.end+"</p>");
+		$("#details").append(paragraph("Deadline    : "+election.end));
 	}
 
 	if(election.description != null){
-	$("#div1").append("<p>Description : "+election.description+"</p>");
+		$("#details").append(paragraph("Description : "+election.description));
 	}
 
 	$("#div1").append("<form>");
 
-	for(var i = 0; i < election.users.length; i++){
-	var user = election.users[i];
-	$("#div1").append("<input type='radio' name='choice' value='"+user+"'>"+user+"</input>");
-	$("#div1").append("<br>");
-	}
-	$("#div1").append("</form>");
+	if(create_date_from_string(election.end) >= new Date()){
+		//Election not finished yet
+		for(var i = 0; i < election.users.length; i++){
+		var user = election.users[i];
+		$("#div1").append("<input type='radio' name='choice' value='"+user+"'>"+user+"</input>");
+		$("#div1").append("<br>");
+		}
+		$("#div1").append("</form>");
 	
-    	$("#div1").append(clickableElement('button', 'Submit', function(){
-		var selected_sciper = Number($("input[type='radio'][name='choice']:checked").val());
-		submit_vote(election, selected_sciper);
-		}));
+	    	$("#div1").append(clickableElement('button', 'Submit', function(){
+			var selected_sciper = Number($("input[type='radio'][name='choice']:checked").val());
+			submit_vote(election, selected_sciper);
+			}));
+	}else{
+		$("#div1").append(h3("The vote for this election is over."));
+		//Should show the result
+	}
 }
 
 /**
@@ -117,6 +126,31 @@ function display_elections(elections){
 	
 	$("#div1").append(paragraph("Note that you can vote several times for the same election,"));
 	$("#div1").append(paragraph("However, only the last vote will be taken into account."));
+}
+
+/**
+* Verify if a given string representing a date is in the good format (DD/MM/YYYY).
+* @param String date : the string to verify.
+* @return true if the given string matches the requirements, false otherwise
+*/
+function verify_valid_date(date){
+	var regex = /(\d\d\/\d\d\/\d\d\d\d)/;
+	return date.length == 10 && date.match(regex);
+}
+
+/**
+* Create a Date from the given string (which should be in the DD/MM/YYYY format).
+* @param String string : the string to convert into a date.
+* @return Date : a date from the given representation, null if the representation wasn't in a good format.
+*/
+function create_date_from_string(string){
+	if(verify_valid_date(string)){
+		var splitted = string.split('/');
+		return new Date(Number(splitted[2]), 
+			Number(splitted[1]), Number(splitted[0]), 0, 0, 0, 0);
+	}else{
+		return null;
+	}
 }
 
 /**

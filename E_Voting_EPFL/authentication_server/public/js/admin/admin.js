@@ -16,7 +16,7 @@ var election1 = {
     creator : 247222,
     users : [247222, 123456, 789456, 147252],
     description : "The EPFL needs a new director.",
-    end : "December 12, 2017"
+    end : "12/05/2018"
 }
 
 var election2 = {
@@ -24,7 +24,7 @@ var election2 = {
     creator : 247222,
     users : [247222, 123456, 789456, 147252, 123764, 369741],
     description : "Who's gonna be the next ?",
-    end : "February 22, 2018"
+    end : "22/02/2018"
 }
 
 var election3 = {
@@ -32,7 +32,7 @@ var election3 = {
     creator : 247222,
     users : [247222, 123456, 789456],
     description : "Some description",
-    end : "Tomorrow"
+    end : "08/12/2017"
 }
 
 var election4 = {
@@ -40,7 +40,7 @@ var election4 = {
     creator : 247222,
     users : [247222, 123456, 789456, 147252],
     description : "Another description",
-    end : "Sometime"
+    end : "04/09/2017"
 }
 
 var elections = [election1, election2, election3, election4];
