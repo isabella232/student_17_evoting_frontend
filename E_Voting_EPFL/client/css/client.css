@@ -1,0 +1,27 @@
+body{
+    border: 1px solid black;
+}
+
+.row{
+    margin: 2px;
+}
+
+#banner_image{
+    display:inline-block;
+    float: right;
+    max-height: 10vh;
+}
+
+#banner_text{
+    display:inline-block;
+    text-align: center;
+    max-width: 60%;
+    text-shadow: 2px 2px #000000;
+}
+
+#banner {
+    background-color: red;
+    color: white;
+    max-height: 10vh;
+    display: block;
+}
