@@ -7,14 +7,34 @@
 * Create a clickable element with a given type.
 * @param String elementType : the type of the element to create.
 * @param String textToDisplay : the text to display on the element.
-* @param function onClick : the function to execute when clicking on the created element.
+* @param Function onClick : the function to execute when clicking on the created element.
+* @param String className : name of class to add to the element.
 * @return HTML Element : an element with the given attributes.
 */
-function clickableElement(elementType, textToDisplay, onClick){
-    var element = document.createElement(elementType);
-    element.innerHTML = textToDisplay;
-    element.addEventListener("click", onClick);
-    return element;
+function clickableElement(elementType, textToDisplay, onClick, className){
+	var element = document.createElement(elementType);
+	element.innerHTML = textToDisplay;
+	element.addEventListener("click", onClick);
+	element.style.cursor = "pointer";
+	if(typeof className != "undefined"){
+		element.className += className;
+	}
+	return element;
+}
+
+/**
+* Creates a real button, satisfying the design of the buttons set with a given color.
+* @param String textToDisplay : the text to display on the button.
+* @param String color : the hex representation of the color of the button.
+* @param Function onClick : the function to execute on click.
+* @return HTML Element : a clickable button with the given text, color and on click function.
+*/
+function clickableButton(textToDisplay, color, onClick){
+	var element = clickableElement("button", textToDisplay, onClick);
+	element.style.backgroundColor = color;
+	element.style.height = "50px";
+	element.style.color = "#000000";
+	return element;
 }
 
 /**
@@ -34,7 +54,7 @@ function unclickableButton(textToDisplay, color){
 }
 
 /**
-* Create a division with the given ID and a text alignment set to left.
+* Create a division with the given ID centered and with a text alignment set to left.
 * @param id : the id of the new division.
 * @return HTML Element : a division with the given id.
 */
@@ -43,6 +63,20 @@ function createDiv(id){
 	element.id = id;
 	element.style.textAlign = "left";
 	element.style.width = "30%";
+	element.style.margin = "0 auto";
+	return element;
+}
+
+/**
+* Create a division with the given ID made to host a grid.
+* @param id : the id of the new division.
+* @return HTML Element : a division with the given id.
+*/
+function createGrid(id){
+	var element = document.createElement("div");
+	element.id = id;
+	element.style.width = "80%";
+	element.style.height = "350px";
 	element.style.margin = "0 auto";
 	return element;
 }

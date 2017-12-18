@@ -7,15 +7,21 @@
 * Create a clickable element with a given type.
 * @param String elementType : the type of the element to create.
 * @param String textToDisplay : the text to display on the element.
-* @param function onClick : the function to execute when clicking on the created element.
+* @param Function onClick : the function to execute when clicking on the created element.
+* @param String className : name of class to add to the element.
 * @return HTML Element : an element with the given attributes.
 */
-function clickableElement(elementType, textToDisplay, onClick){
-    var element = document.createElement(elementType);
-    element.innerHTML = textToDisplay;
-    element.addEventListener("click", onClick);
-    return element;
+function clickableElement(elementType, textToDisplay, onClick, className){
+	var element = document.createElement(elementType);
+	element.innerHTML = textToDisplay;
+	element.addEventListener("click", onClick);
+	element.style.cursor = "pointer";
+	if(typeof className != "undefined"){
+		element.className += className;
+	}
+	return element;
 }
+
 /**
 * Create a division with the given ID and a text alignment set to left.
 * @param id : the id of the new division.

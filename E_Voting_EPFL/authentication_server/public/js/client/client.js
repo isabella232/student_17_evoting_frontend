@@ -43,7 +43,7 @@ var election4 = {
     end : "04/09/2017"
 }
 
-var elections = [election1, election2, election3, election4];
+var elections = [election3, election1, election2, election4];
 //**************************************
 
 $('document').ready(function(){
@@ -98,15 +98,24 @@ function authenticate(){
     window.location.replace(authentication_server_auth);
 }
 
-function mockAuthentication(){
-	user_sciper = 247222;
+function logout(){
+	user_sciper = null;
+	session_token = null;
+	recovered_elections = null;
+	show_nav_disconnected();
+	clearDisplay();
+        display_welcome_page();
+}
+
+function mockAuthentication(sciper){
+	user_sciper = sciper;
 	const loginRequest = {
             master : master_pin,
             user : user_sciper,
             signature : new Uint8Array([])
         }
         
-	mockConodes();
+	//mockConodes();
         sendLoginRequest(loginRequest);
 }
 
@@ -114,6 +123,6 @@ function mockConodes(){
 	clearDisplay();
 	session_token = 0;
 	//Tests elections
-	recovered_elections = elections;
+	recovered_elections = elections.sort(compare_by_date);
 	display_elections(recovered_elections);
 }

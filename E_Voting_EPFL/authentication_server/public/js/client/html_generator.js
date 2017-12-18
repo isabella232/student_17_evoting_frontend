@@ -16,9 +16,6 @@ function show_banner(){
 */
 function show_nav_disconnected(){
 	clear_navigation();
-	$("#user_infos").append(clickableElement("p", "Login", function(){
-		authenticate();
-		}));
 }
 
 /**
@@ -28,6 +25,9 @@ function show_nav_connected(){
 	clear_navigation();
 	$("#nav_election_list").append(clickableElement("p", "Election list", function(){
 		display_elections(recovered_elections);
+		}));
+	$("#logout").append(clickableElement("p", "Logout", function(){
+		logout();
 		}));
 	$("#user_infos").append(paragraph("Hi "+user_sciper));
 }
@@ -41,11 +41,20 @@ function display_welcome_page(){
 	$("#div1").append(paragraph("This application allows you to vote for EPFL's elections"));
 	$("#div1").append(paragraph("while ensuring you security and authenticity.")); 
 	$("#div1").append(paragraph("To see the elections available, please login."));
+	$("#div1").append("<form>");
+	$("#div1").append(paragraph("Sciper :"));
+	$("#div1").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
+	$("#div1").append("</form>");
 	$("#div1").append(clickableElement("button", "Login", function(){
 		//authenticate();
-		// Mocking authentication waiting to find the bug.
-		mockAuthentication();
-		show_nav_connected();
+		// Mocking authentication waiting to turn into HTTPS.
+		var sciper = $("input[type='text'][name='sciper']").val();
+		if(verify_valid_sciper(sciper)){
+			mockAuthentication(sciper);
+			show_nav_connected();
+		}else{
+			$("#errDiv").append(paragraph("Incorrect SCIPER, please enter a valid one."));
+		}
 		}));
 }
 
@@ -56,8 +65,21 @@ function display_welcome_page(){
 function display_election_list_item(election){
     	$("#div1").append(clickableElement('h3', ''+election.name, function(){
 		display_election_full(election);
-	    }));
-	$("#div1").append(h4("End date : "+election.end));	
+	    }, "list_item"));
+	if(create_date_from_string(election.end) > new Date()){
+		//Display end date when the election is not finished.
+		$("#div1").append(h4("End date : "+election.end));
+	}else if(election.data[0] == 0){
+		//Clearly state that the election is finished (unshuffled case).
+		var element = h4("Finished");
+		element.style.color = "#FF0000";
+		$("#div1").append(element);
+	}else{
+		//Clearly state that the election is finished and shuffled.
+		var element = h4("Finished - Shuffled");
+		element.style.color = "#FF0000";
+		$("#div1").append(element);
+	}	
 	$("#div1").append(separation_line());
 }
 
@@ -69,9 +91,9 @@ function display_election_full(election){
 
 	clearDisplay();	
 
-	$("#div1").append("<h2>"+election.name+"</h2>");
-
 	$("#div1").append(createDiv("details"));
+
+	$("#details").append("<h2>"+election.name+"</h2>");
 
 	if(election.creator != null){
 		$("#details").append(paragraph("Created by  : "+election.creator));
@@ -79,6 +101,15 @@ function display_election_full(election){
 
 	if(election.end != null){
 		$("#details").append(paragraph("Deadline    : "+election.end));
+		//Can be used to display remaining time when we found a good way to compute election.end - today.
+		/*if(create_date_from_string(election.end) > new Date()){
+			var rem_time = create_date_from_string(election.end);
+			var today = new Date();
+			rem_time.set
+			$("#details").append(paragraph("Remaining time : "+rem_time.toDateString()));
+		}else{
+			$("#details").append(paragraph("This election is already over."));
+		}*/
 	}
 
 	if(election.description != null){
@@ -87,16 +118,19 @@ function display_election_full(election){
 
 	$("#div1").append("<form>");
 
-	if(create_date_from_string(election.end) >= new Date()){
+	if(create_date_from_string(election.end) >= new Date()){	
+
+		$("#div1").append(createDiv("choices"));
+
 		//Election not finished yet
 		for(var i = 0; i < election.users.length; i++){
 		var user = election.users[i];
-		$("#div1").append("<input type='radio' name='choice' value='"+user+"'>"+user+"</input>");
-		$("#div1").append("<br>");
+		$("#choices").append("<input type='radio' name='choice' value='"+user+"'>"+user+"</input>");
+		$("#choices").append("<br>");
 		}
-		$("#div1").append("</form>");
+		$("#choices").append("</form>");
 	
-	    	$("#div1").append(clickableElement('button', 'Submit', function(){
+	    	$("#choices").append(clickableElement('button', 'Submit', function(){
 			var selected_sciper = Number($("input[type='radio'][name='choice']:checked").val());
 			submit_vote(election, selected_sciper);
 			}));
@@ -129,6 +163,16 @@ function display_elections(elections){
 }
 
 /**
+* Verify if a given string representing a SCIPER number is in the good format (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+* @param String sciper : the string to verify.
+* @return true if the given sciper matches the requirements, false otherwise.
+*/
+function verify_valid_sciper(sciper){
+	var regex = /(\d\d\d\d\d\d)/;
+	return sciper.length == 6 && sciper.match(regex);
+}
+
+/**
 * Verify if a given string representing a date is in the good format (DD/MM/YYYY).
 * @param String date : the string to verify.
 * @return true if the given string matches the requirements, false otherwise
@@ -147,7 +191,7 @@ function create_date_from_string(string){
 	if(verify_valid_date(string)){
 		var splitted = string.split('/');
 		return new Date(Number(splitted[2]), 
-			Number(splitted[1]), Number(splitted[0]), 0, 0, 0, 0);
+			Number(splitted[1]) - 1, Number(splitted[0]), 0, 0, 0, 0);
 	}else{
 		return null;
 	}
@@ -167,6 +211,6 @@ function clearDisplay(){
 */
 function clear_navigation(){
 	$("#nav_election_list").empty();
-	$("#nav_create_election").empty();
+	$("#logout").empty();
 	$("#user_infos").empty();
 }
