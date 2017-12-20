@@ -7,22 +7,10 @@ const red = "#ff0707";
 const green = "#30f209";
 const grey = "#b2a0a0";
 
-const fakeBox = [
-	{recid : 1, user : 247222, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 2, user : 123456, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 3, user : 147852, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 4, user : 987456, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 5, user : 852369, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 6, user : 123457, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 7, user : 145236, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 8, user : 245698, alpha : "AAA", beta : "BBB", text : "plain"},
-	{recid : 9, user : 345876, alpha : "AAA", beta : "BBB", text : "plain"}
-	];
-
 /**
 * Inject the banner with the EPFL logo and the name of the application.
 */
-function show_banner(){
+function showBanner(){
     	$("#banner").append("<img src='./../res/drawable/epfl_logo.png' id='banner_image'></img>");
     	$("#banner").append("<h2 id='banner_text'>EPFL E-Voting </h2>");
 }
@@ -30,43 +18,40 @@ function show_banner(){
 /**
 * Inject the code for an unlogged admin.
 */
-function show_unlogged(){
-	show_nav_disconnected();
+function showUnlogged(){
+	showNavDisconnected();
 	clearDisplay();
-        display_welcome_page();
-	$("#div2").append(clickableElement("button", "Show me a box", function(){
-		display_ballot_box(fakeBox);
-	}));
+        displayWelcomePage();
 }
 
 /**
 * Inject the navigation bar for a disconnected user.
 */
-function show_nav_disconnected(){
-	clear_navigation();
+function showNavDisconnected(){
+	clearNavigation();
 }
 
 /**
 * Inject the navigation bar for a connected user.
 */
-function show_nav_connected(){
-	clear_navigation();
-	$("#nav_election_list").append(clickableElement("p", "Your elections", function(){
-		display_elections(recovered_elections);
+function showNavConnected(){
+	clearNavigation();
+	$("#nav_election_list").append(clickableElement("p", "Admin election", function(){
+		displayElections(recoveredElections);
 		}));
 	$("#nav_create_election").append(clickableElement("p", "Create election", function(){
-		display_election_creation(recovered_elections);
+		displayElectionCreation(recoveredElections);
 		}));
 	$("#logout").append(clickableElement("p", "Logout", function(){
 		logout();
 		}));
-	$("#user_infos").append(paragraph("Hi "+user_sciper));
+	$("#user_infos").append(paragraph("Hi "+userSciper));
 }
 
 /**
 * Inject a welcome text when a client arrives unlogged on the web page.
 */
-function display_welcome_page(){
+function displayWelcomePage(){
 	$("#div1").append(paragraph(""));
 	$("#div1").append(h3("Welcome to the admin part of the EPFL E-Voting application !"));
 	$("#div1").append(paragraph("This application allows you to create elections and manage the one you already created"));
@@ -80,9 +65,8 @@ function display_welcome_page(){
 		//authenticate();
 		// Mocking authentication waiting to turn in HTTPS.
 		var sciper = $("input[type='text'][name='sciper']").val();
-		if(verify_valid_sciper(sciper)){
+		if(verifyValidSciper(sciper)){
 			mockAuthentication(sciper);
-			show_nav_connected();
 		}else{
 			$("#errDiv").append(paragraph("Incorrect SCIPER, please enter a valid one."));
 		}
@@ -94,19 +78,37 @@ function display_welcome_page(){
 * Display an election list item and associate an OnClickListener to it.
 * @param Election election : the election to display as a list item.
 */
-function display_election_list_item(election){
+function displayElectionListItem(election){
     	$("#div1").append(clickableElement('h3', ''+election.name, function(){
-		display_election_full(election);
+		displayElectionFull(election);
 	    }, "list_item"));
-	$("#div1").append(h4("End date : "+election.end));	
-	$("#div1").append(separation_line());
+
+	if(createDateFromString(election.end) > new Date()){
+		//Display end date when the election is not finished.
+		$("#div1").append(h4("End date : "+election.end));
+	}else if(election.stage == 0){
+		//Clearly state that the election is finished (unshuffled case).
+		var element = h4("Finished");
+		element.style.color = "#FF0000";
+		$("#div1").append(element);
+	}else if(election.stage == 1){
+		//Clearly state that the election is finished and shuffled.
+		var element = h4("Finished - Shuffled");
+		element.style.color = "#FF0000";
+		$("#div1").append(element);
+	}else{
+		var element = h4("Finished - Decrypted");
+		element.style.color = "#FF0000";
+		$("#div1").append(element);	
+	}	
+	$("#div1").append(separationLine());
 }
 
 /**
 * Display all the informations of a given election and the radio buttons showing the possible votes.
 * @param Election election : the election to display.
 */
-function display_election_full(election){
+function displayElectionFull(election){
 	clearDisplay();	
 
 	$("#div1").append(createDiv("details"));
@@ -125,24 +127,24 @@ function display_election_full(election){
 		$("#details").append(paragraph("Description : "+election.description));
 	}
 
-	var users_string = "";
+	var usersString = "";
 	for(var i=0; i < election.users.length; i++){
-		users_string += election.users[i];
+		usersString += election.users[i];
 		if(i != election.users.length - 1){
-			users_string += ", ";
+			usersString += ", ";
 		}
 	}
-	$("#details").append(paragraph("Participants : "+users_string));
+	$("#details").append(paragraph("Participants : "+usersString));
 
-	if(create_date_from_string(election.end) >= new Date()){
+	if(createDateFromString(election.end) >= new Date()){
 		//End date not reached yet
-		display_voting_button_set();
+		displayVotingButtonSet();
 	}else{
 		//End date reached
-		if(election.data && election.data[0] == 1){		
-			display_aggregate_button_set(election);
+		if(election.stage == 0){
+			displayFinalizeButtonSet(election);		
 		}else{
-			display_finalize_button_set(election);
+			displayAggregateButtonSet(election);
 		}
 	}
 }
@@ -150,53 +152,52 @@ function display_election_full(election){
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the deadline is not reached yet.
 */
-function display_voting_button_set(){
-	$("#div1").append(unclickableButton("Voting", green));
-	$("#div1").append(unclickableButton("Finalize", grey));
-	$("#div1").append(unclickableButton("Aggregate", grey));
-	$("#div1").append(paragraph("The election end date is not reached yet, the voters can still vote."));
+function displayVotingButtonSet(){
+	$("#details").append(unclickableButton("Voting", green));
+	$("#details").append(unclickableButton("Shuffle", grey));
+	$("#details").append(unclickableButton("Aggregate", grey));
+	$("#details").append(paragraph("The election end date is not reached yet, the voters can still vote."));
 }
 
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the vote is over but unshuffled.
 * @param Election election : the election.
 */
-function display_finalize_button_set(election){
-	$("#div1").append(unclickableButton("Voting", red));
-	$("#div1").append(clickableButton("Finalize", green, function(){
+function displayFinalizeButtonSet(election){
+	$("#details").append(unclickableButton("Voting", red));
+	$("#details").append(clickableButton("Shuffle", green, function(){
 		finalize(election);
 		}));
-	$("#div1").append(unclickableButton("Aggregate", grey));
-	$("#div1").append(paragraph("The election is now over, you can now finalize and shuffle the election."));
+	$("#details").append(unclickableButton("Aggregate", grey));
+	$("#details").append(paragraph("The election is now over, you can now finalize and shuffle the election."));
 }
 
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the vote is over and shuffled.
 * @param Election election : the election.
 */
-function display_aggregate_button_set(election){
-	$("#div1").append(unclickableButton("Voting", red));
-	$("#div1").append(unclickableButton("Finalize", red));
-	$("#div1").append(clickableButton("Aggregate", green, function(){
-		display_choose_aggregate(election);
-		}));
-	$("#div1").append(paragraph("The election is now over and shuffled, you can now aggregate the result."));
+function displayAggregateButtonSet(election){
+	$("#details").append(unclickableButton("Voting", red));
+	$("#details").append(unclickableButton("Shuffle", red));
+	$("#details").append(unclickableButton("Aggregate", green));
+	displayChooseAggregate(election);
+	$("#details").append(paragraph("The election is now over and shuffled, you can now aggregate the result."));
 }
 
 /**
 * Display all elections available in a list.
 * @param Array{Election} elections : the election list to display.
 */
-function display_elections(elections){
+function displayElections(elections){
     	clearDisplay();
 
     	if(elections.length > 0){
 		$("#div1").append(h2("Your elections :"));
-		$("#div1").append(separation_line());
+		$("#div1").append(separationLine());
 		for(var i = 0; i < elections.length; i++){
-			if(elections[i].creator == user_sciper){
+			if(elections[i].creator == userSciper){
 				$("#div1").append("    ");
-				display_election_list_item(elections[i]);
+				displayElectionListItem(elections[i]);
 			}
 		}
 	}else{
@@ -207,9 +208,9 @@ function display_elections(elections){
 /**
 * Inject the code needed for the election creation.
 */
-function display_election_creation(){
+function displayElectionCreation(){
 	clearDisplay();
-	var number_participants = 0;
+	var numberParticipants = 0;
 	$("#div1").append(createDiv("details"));
 	$("#details").append(paragraph("Here you can create an election."));
 	$("#details").append("<form>");
@@ -234,7 +235,7 @@ function display_election_creation(){
 		}
 
 		var deadline = $("input[type='text'][name='deadline']").val();
-		if(!verify_valid_date(deadline)){
+		if(!verifyValidDate(deadline)){
 			$("#errDiv").append(paragraph("The date does not satisfy at least one of the requirements."));
 			$("#errDiv").append(paragraph("The date should respect the format DD/MM/YYYY, be a valid date,"));
 			$("#errDiv").append(paragraph("and no past date are allowed."));
@@ -243,17 +244,17 @@ function display_election_creation(){
 		
 		var description = $("textarea[name='description']").val();
 
-		var participants_string = ($("textarea[name='participants']").val()).split('\n');
-		if(participants_string.length == 0){
+		var participantsString = ($("textarea[name='participants']").val()).split('\n');
+		if(participantsString.length == 0){
 			$("#errDiv").append(paragraph("Please add some participants to the election."));
 			errors = true;
 		}
 		
 		var participants = [];
 
-		for(var i = 0; i < participants_string.length; i++){
-			if(verify_valid_sciper(participants_string[i])){
-				participants[i] = Number(participants_string[i]);
+		for(var i = 0; i < participantsString.length; i++){
+			if(verifyValidSciper(participantsString[i])){
+				participants[i] = Number(participantsString[i]);
 			}else{
 				$("#errDiv").append(paragraph("The participant number "+(i+1)+" is not well written."));
 				errors = true;
@@ -261,7 +262,7 @@ function display_election_creation(){
 		}		
 
 		if(!errors){
-			election_confirmation(name, deadline, description, participants);
+			electionConfirmation(name, deadline, description, participants);
 		}
 	}));
 }
@@ -273,84 +274,191 @@ function display_election_creation(){
 * @param String description : the description of the election.
 * @param Uint8Array participants : the list of the scipers of the participants to the election.
 */
-function election_confirmation(name, deadline, description, participants){
+function electionConfirmation(name, deadline, description, participants){
 	clearDisplay();
 	$("#div1").append(createDiv("details"));
 
 	$("#details").append(paragraph("Your election is ready to be created,"));
 	$("#details").append(paragraph("Please verify the validity of the informations and then validate."));
-	$("#details").append(separation_line());
+	$("#details").append(separationLine());
 	$("#details").append(paragraph("Name : "+name));
 	$("#details").append(paragraph("Deadline : "+deadline));
-	$("#details").append(paragraph("Creator : "+user_sciper));
+	$("#details").append(paragraph("Creator : "+userSciper));
 	$("#details").append(paragraph("Description : "+description));
 	$("#details").append("Participants :<br>");
-	var participant_sciper;
+	var participantSciper;
 	for(var i = 0; i < participants.length; i++){
 		$("#details").append(participants[i]+"<br>");
 	}
 
 	$("#details").append(clickableElement("button", "Create", function(){
-		create_election(name, deadline, description, participants);
+		createElection(name, deadline, description, participants);
 		}));
 	$("#details").append(clickableElement("button", "Modify", function(){
-		display_election_creation();
-		inject_election_details(name, deadline, description, participants);
+		displayElectionCreation();
+		injectElectionDetails(name, deadline, description, participants);
 		}));
 }
 
-function display_choose_aggregate(election){
+/**
+* Display the different aggregations possible for the given election.
+* @param Election election : the election concerned.
+*/
+function displayChooseAggregate(election){
 	$("#div2").empty();
-	$("#div2").append(paragraph("Please select the desired aggregation."));
-	$("#div2").append(clickableElement("button", "Ballot", function(){
-		aggregate_ballot(election);
+	$("#div2").append(paragraph("Show one of the following steps :"));
+	$("#div2").append(clickableElement("button", "Voting", function(){
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		aggregateBallot(election);
 		}));
 	$("#div2").append(clickableElement("button", "Shuffle", function(){
-		aggregate_shuffle(election);
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		aggregateShuffle(election);
 		}));
 	$("#div2").append(clickableElement("button", "Decrypted", function(){
-		aggregate_decrypted(election);
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		if(election.stage < 2){
+			decryptBallots(election);
+		}else{
+			aggregateDecrypted(election);
+		}
+		}));
+	$("#div2").append(clickableElement("button", "Result", function(){
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		// Here we should aggregate and show the final result.
 		}));
 }
 
-function display_ballot_box(box){
-	$("#div2").append(paragraph("Aggregated ballots :"));
+/**
+* Display a list of encrypted ballots in a grid. Three fields are displayed :
+* - The sciper of the voter.
+* - His encrypted ElGalmal pair [alpha, beta].
+* @param Array[Ballot] box : a list of ballots. 
+*/
+function displayBallotBox(box){
+
+	var numberedBallots = [];
+	for(var i = 0; i < box.length; i++){
+		var ballot = box[i];
+		var numberedBallot = {
+			recid: i,
+			user: ballot.user,
+			alpha: dedis.misc.uint8ArrayToHex(ballot.alpha), 
+			beta: dedis.misc.uint8ArrayToHex(ballot.beta)
+		}
+		numberedBallots[i] = numberedBallot;
+	}
 
 	$("#div2").append(createGrid("gridDiv")); 
 
+	var randomID = ""+Math.floor(Math.random() * 1000000000)
+		
 	$('#gridDiv').w2grid({
-		name: 'grid',
+		name: randomID,
 		header: 'List of Ballots',
 		show: {
 		toolbar: true,
 		footer: true
 		},
 		columns: [
-		{ field: 'recid', caption: 'ID', size: '50px', sortable:true, attr: 'align=center' },
 		{ field: 'user', caption: 'Sciper', size: '60px', sortable: true, attr: 'align=center' },
-		{ field: 'alpha', caption: 'Alpha', size: '30%', sortable: true, resizable: true },
-		{ field: 'beta', caption: 'Beta', size: '30%', sortable: true, resizable: true },
-		{ field: 'text', caption: 'Plain Text', size: '40%', resizable: true },
+		{ field: 'alpha', caption: 'Alpha', size: '50%', sortable: true, resizable: true },
+		{ field: 'beta', caption: 'Beta', size: '50%', sortable: true, resizable: true }
 		],
 		searches: [
-		{ field: 'user', caption: 'Sciper', type: 'text' },
+		{ field: 'user', caption: 'Sciper', type: 'text' }
+		],
+		sortData: [{ field: 'user', direction: 'ASC' }],
+		records: numberedBallots
+	});
+}
+
+/**
+* Display a list of shuffled ballots in a grid. Three fields are displayed :
+* - The sciper of the voter.
+* - His encrypted shuffled ElGalmal pair [alpha, beta].
+* @param Array[Ballot] box : a list of ballots. 
+*/
+function displayShuffledBox(box){
+
+	var numberedBallots = [];
+	for(var i = 0; i < box.length; i++){
+		var ballot = box[i];
+		var numberedBallot = {
+			recid: i,
+			user: ballot.user,
+			alpha: dedis.misc.uint8ArrayToHex(ballot.alpha), 
+			beta: dedis.misc.uint8ArrayToHex(ballot.beta)
+		}
+		numberedBallots[i] = numberedBallot;
+	}
+
+	$("#div2").append(createGrid("gridDiv")); 
+
+	var randomID = ""+Math.floor(Math.random() * 1000000000)
+		
+	$('#gridDiv').w2grid({
+		name: randomID,
+		header: 'List of shuffled ballots',
+		show: {
+		toolbar: true,
+		footer: true
+		},
+		columns: [
+		{ field: 'user', caption: 'Sciper', size: '60px', sortable: true, attr: 'align=center' },
+		{ field: 'alpha', caption: 'Alpha', size: '50%', sortable: true, resizable: true },
+		{ field: 'beta', caption: 'Beta', size: '50%', sortable: true, resizable: true }
+		],
+		searches: [
+		{ field: 'user', caption: 'Sciper', type: 'text' }
+		],
+		sortData: [{ field: 'user', direction: 'ASC' }],
+		records: numberedBallots
+	});
+}
+
+/**
+* Display a list of decrypted ballots in a grid. Only the plain text of the ballot is displayed.
+* @param Array[Ballot] box : a list of ballots. 
+*/
+function displayDecryptedBox(box){
+
+	var numberedBallots = [];
+	for(var i = 0; i < box.length; i++){
+		var ballot = box[i];
+		var array = ballot.text;
+		var plain = array[0]+0x100*array[1]+0x10000*array[2];
+		var numberedBallot = {
+			recid: i,
+			text: plain
+		}
+		numberedBallots[i] = numberedBallot;
+	}
+
+	$("#div2").append(createGrid("gridDiv")); 
+
+	var randomID = ""+Math.floor(Math.random() * 1000000000)
+		
+	$('#gridDiv').w2grid({
+		name: randomID,
+		header: 'List of decrypted ballots',
+		show: {
+		toolbar: true,
+		footer: true
+		},
+		columns: [
+		{ field: 'text', caption: 'Plain Text', size: '100%', resizable: true },
+		],
+		searches: [
 		{ field: 'text', caption: 'Plain Text', type: 'text' },
 		],
-		sortData: [{ field: 'recid', direction: 'ASC' }],
-		records: box,
-		onRender: function(){
-			console.log("chabadabadou");
-			this.refresh();
-		}
+		sortData: [{ field: 'text', direction: 'ASC' }],
+		records: numberedBallots
 	});
-
-	/*onRefresh: function (target, eventData) {
-			var grid = this;
-			eventData.onComplete = function () {
-				console.log( "chabadabadou" );
-				grid.refresh();
-			}
-		}*/
 }
 
 /**
@@ -360,18 +468,18 @@ function display_ballot_box(box){
 * @param String description : the description of the election.
 * @param Uint8Array participants : the scipers of the participants.
 */
-function inject_election_details(name, deadline, description, participants){
+function injectElectionDetails(name, deadline, description, participants){
 	$("input[type='text'][name='name']").val(name);
 	$("input[type='text'][name='deadline']").val(deadline);
 	$("textarea[name='description']").val(description);
-	var participants_string = "";
+	var participantsString = "";
 	for(var i = 0; i < participants.length; i++){
-		participants_string += ""+participants[i];
+		participantsString += ""+participants[i];
 		if(i != participants.length - 1){
-			participants_string += "\n";
+			participantsString += "\n";
 		}
 	}
-	$("textarea[name='participants']").val(participants_string);
+	$("textarea[name='participants']").val(participantsString);
 }
 
 /**
@@ -379,7 +487,7 @@ function inject_election_details(name, deadline, description, participants){
 * @param String sciper : the string to verify.
 * @return true if the given sciper matches the requirements, false otherwise.
 */
-function verify_valid_sciper(sciper){
+function verifyValidSciper(sciper){
 	var regex = /(\d\d\d\d\d\d)/;
 	return sciper.length == 6 && sciper.match(regex);
 }
@@ -389,16 +497,16 @@ function verify_valid_sciper(sciper){
 * @param String date : the string to verify.
 * @return true if the given string matches the requirements, false otherwise
 */
-function verify_valid_date(date){
+function verifyValidDate(date){
 	var regex = /(\d\d\/\d\d\/\d\d\d\d)/;
 	if(date.length == 10 && date.match(regex)){
 		var splitted = date.split('/');
 		var day = splitted[0];
 		var month = splitted[1];
 		var year = splitted[2];
-		var gen_date = new Date(year, month, day);
+		var genDate = new Date(year, month, day);
 		//Very basic check for now, can be upgraded.
-		return 1 <= month && month <= 12 && 1 <= day && day <= 31 && gen_date > new Date();
+		return 1 <= month && month <= 12 && 1 <= day && day <= 31 && genDate > new Date();
 	}else{
 		return false;
 	}
@@ -409,8 +517,8 @@ function verify_valid_date(date){
 * @param String string : the string to convert into a date.
 * @return Date : a date from the given representation, null if the representation wasn't in a good format.
 */
-function create_date_from_string(string){
-	if(verify_valid_date(string)){
+function createDateFromString(string){
+	if(verifyValidDate(string)){
 		var splitted = string.split('/');
 		return new Date(Number(splitted[2]), 
 			Number(splitted[1]) - 1, Number(splitted[0]), 0, 0, 0, 0);
@@ -431,7 +539,7 @@ function clearDisplay(){
 /**
 * Clear the navigation bar, the banner and the rest of the display will not be affected by this operation.
 */
-function clear_navigation(){
+function clearNavigation(){
 	$("#nav_election_list").empty();
 	$("#nav_create_election").empty();
 	$("#logout").empty();

@@ -130,7 +130,7 @@ function h4(textToDisplay) {
 * The specificities of this line can be found in the css class "underlined".
 * @return HTMLDivElement an element representing a separation line.
 */
-function separation_line(){
+function separationLine(){
 	var element = document.createElement("div");
 	element.className += "underlined";
 	return element;

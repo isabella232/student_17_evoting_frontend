@@ -70,7 +70,6 @@ app.use(express.static(__dirname + '/public'));
 * relative to the EPFL.
 */
 app.get('/auth', tequila.ensureAuthenticated, function(req, res){
-	console.log("Ici");
     var name = req.user.displayName;
     ldapReq.getUserAttributes(name, function(result){
         

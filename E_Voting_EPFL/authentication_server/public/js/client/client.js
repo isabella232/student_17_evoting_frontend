@@ -4,48 +4,6 @@
 * The web page is a single page application where the update of the content is made through jQuery.
 */
 
-const auth_server_ip = 'localhost';
-
-// Client authentication server location
-const authentication_server_auth = "http://"+auth_server_ip+":3000/auth";
-
-//******************************
-// Testing election display
-var election1 = {
-    name : "Elect the next EPFL director",
-    creator : 247222,
-    users : [247222, 123456, 789456, 147252],
-    description : "The EPFL needs a new director.",
-    end : "12/05/2018"
-}
-
-var election2 = {
-    name : "Elect the next DeDis president",
-    creator : 247222,
-    users : [247222, 123456, 789456, 147252, 123764, 369741],
-    description : "Who's gonna be the next ?",
-    end : "22/02/2018"
-}
-
-var election3 = {
-    name : "Other election",
-    creator : 247222,
-    users : [247222, 123456, 789456],
-    description : "Some description",
-    end : "08/12/2017"
-}
-
-var election4 = {
-    name : "Another election",
-    creator : 247222,
-    users : [247222, 123456, 789456, 147252],
-    description : "Another description",
-    end : "04/09/2017"
-}
-
-var elections = [election3, election1, election2, election4];
-//**************************************
-
 $('document').ready(function(){
    
     socket = new dedis.net.Socket(node, messages);
@@ -56,17 +14,17 @@ $('document').ready(function(){
     */
     var message = sessionStorage.getItem("message");
     
-    show_banner();
+    showBanner();
     clearDisplay();
     
     if(!message){
 
-	show_nav_disconnected();
-        display_welcome_page();
+	showNavDisconnected();
+        displayWelcomePage();
         
     }else{
 
-	show_nav_connected();
+	showNavConnected();
 
         var message = message.split(';');
 
@@ -74,14 +32,14 @@ $('document').ready(function(){
             throw new Error("An error as occured, the infomations haven't been well recovered");
         }
         
-        user_sciper = message[0];
+        userSciper = message[0];
         
-        var id = Number(user_sciper);
+        var id = Number(userSciper);
         var signature = message[1];
         $('#div1').append(paragraph("Connecting, please wait ..."));
        
         const loginRequest = {
-            master : master_pin,
+            master : masterPin,
             user : id,
             signature : new Uint8Array([])
         }
@@ -95,34 +53,25 @@ $('document').ready(function(){
 * Redirects the user to the authentication server.
 */
 function authenticate(){
-    window.location.replace(authentication_server_auth);
+    window.location.replace(authenticationServerAuth);
 }
 
 function logout(){
-	user_sciper = null;
-	session_token = null;
-	recovered_elections = null;
-	show_nav_disconnected();
+	userSciper = null;
+	sessionToken = null;
+	recoveredElections = null;
+	showNavDisconnected();
 	clearDisplay();
-        display_welcome_page();
+        displayWelcomePage();
 }
 
 function mockAuthentication(sciper){
-	user_sciper = sciper;
+	userSciper = sciper;
 	const loginRequest = {
-            master : master_pin,
-            user : user_sciper,
+            master : masterPin,
+            user : userSciper,
             signature : new Uint8Array([])
         }
         
-	//mockConodes();
         sendLoginRequest(loginRequest);
-}
-
-function mockConodes(){
-	clearDisplay();
-	session_token = 0;
-	//Tests elections
-	recovered_elections = elections.sort(compare_by_date);
-	display_elections(recovered_elections);
 }
