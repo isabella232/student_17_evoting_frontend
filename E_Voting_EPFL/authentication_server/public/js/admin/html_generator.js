@@ -3,9 +3,12 @@
 * Contains all the methods that allows to inject HTML in the document.
 */
 
+
+//Some colors constants for the buttons.
 const red = "#ff0707";
 const green = "#30f209";
 const grey = "#b2a0a0";
+
 
 /**
 * Inject the banner with the EPFL logo and the name of the application.
@@ -14,6 +17,7 @@ function showBanner(){
     	$("#banner").append("<img src='./../res/drawable/epfl_logo.png' id='banner_image'></img>");
     	$("#banner").append("<h2 id='banner_text'>EPFL E-Voting </h2>");
 }
+
 
 /**
 * Inject the code for an unlogged admin.
@@ -24,12 +28,14 @@ function showUnlogged(){
         displayWelcomePage();
 }
 
+
 /**
 * Inject the navigation bar for a disconnected user.
 */
 function showNavDisconnected(){
 	clearNavigation();
 }
+
 
 /**
 * Inject the navigation bar for a connected user.
@@ -47,6 +53,7 @@ function showNavConnected(){
 		}));
 	$("#user_infos").append(paragraph("Hi "+userSciper));
 }
+
 
 /**
 * Inject a welcome text when a client arrives unlogged on the web page.
@@ -74,8 +81,10 @@ function displayWelcomePage(){
 	$("#div1").append(h4("Be aware that an admin account is required to access this page"));
 }
 
+
 /**
 * Display an election list item and associate an OnClickListener to it.
+*
 * @param Election election : the election to display as a list item.
 */
 function displayElectionListItem(election){
@@ -104,8 +113,10 @@ function displayElectionListItem(election){
 	$("#div1").append(separationLine());
 }
 
+
 /**
 * Display all the informations of a given election and the radio buttons showing the possible votes.
+*
 * @param Election election : the election to display.
 */
 function displayElectionFull(election){
@@ -149,6 +160,7 @@ function displayElectionFull(election){
 	}
 }
 
+
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the deadline is not reached yet.
 */
@@ -159,8 +171,10 @@ function displayVotingButtonSet(){
 	$("#details").append(paragraph("The election end date is not reached yet, the voters can still vote."));
 }
 
+
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the vote is over but unshuffled.
+*
 * @param Election election : the election.
 */
 function displayFinalizeButtonSet(election){
@@ -172,8 +186,10 @@ function displayFinalizeButtonSet(election){
 	$("#details").append(paragraph("The election is now over, you can now finalize and shuffle the election."));
 }
 
+
 /**
 * Display a set of 3 buttons representing the state of the vote in the case where the vote is over and shuffled.
+*
 * @param Election election : the election.
 */
 function displayAggregateButtonSet(election){
@@ -184,8 +200,86 @@ function displayAggregateButtonSet(election){
 	$("#details").append(paragraph("The election is now over and shuffled, you can now aggregate the result."));
 }
 
+
+/**
+* Display the different aggregations possible for the given election.
+*
+* @param Election election : the election concerned.
+*/
+function displayChooseAggregate(election){
+	$("#div2").empty();
+	$("#div2").append(paragraph("Show one of the following steps :"));
+	$("#div2").append(clickableElement("button", "Voting", function(){
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		aggregateBallot(election);
+		}));
+	$("#div2").append(clickableElement("button", "Shuffle", function(){
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		aggregateShuffle(election);
+		}));
+	$("#div2").append(clickableElement("button", "Result", function(){
+		$("#div2").empty();
+		displayChooseAggregate(election);
+		decryptAndDisplayElectionResult(election);
+		}));
+}
+
+
+/**
+* Displays the result of the election in a grid.
+* 
+* @param Election election : the election of which we want to display the result.
+* @param Array[Ballot] ballots : the list of the decrypted ballots of the election.
+*/
+function displayElectionResult(election, ballots){
+
+	$("#div2").append(paragraph("Election result : "));
+	
+	var pairArray = [];
+	for(var i = 0; i < election.users.length; i++){
+		pairArray[i] = {key: election.users[i], value: 0};
+	}
+
+	for(var j = 0; j < ballots.length; j++){
+		var ballot = ballots[j];
+		var array = ballot.text;
+		var plain = array[0]+0x100*array[1]+0x10000*array[2];
+
+		var index;
+		for(var i = 0; i < pairArray.length; i++){
+			if(pairArray[i].key == plain){
+				index = i;
+			}
+		}
+		var tmp = pairArray[index].value;
+		pairArray[index] = {key: plain, value: tmp + 1};
+	}
+
+	pairArray.sort(comparePairs);
+
+	var displayedArray = [];
+	for(var i = 0 ; i < pairArray.length; i++){
+		displayedArray[i] = {recid: (i + 1), sciper: pairArray[i].key, votes: pairArray[i].value};
+	}
+
+	generateResultGrid(displayedArray);
+	
+}
+
+
+/**
+* compares a key / value pair by comparing their values.
+*/
+function comparePairs(pair1, pair2){
+	return pair1.value < pair2.value;
+}
+
+
 /**
 * Display all elections available in a list.
+*
 * @param Array{Election} elections : the election list to display.
 */
 function displayElections(elections){
@@ -204,6 +298,7 @@ function displayElections(elections){
 		$("#div1").append(paragraph("You didn't create any elections yet."));
 	}
 }
+
 
 /**
 * Inject the code needed for the election creation.
@@ -267,8 +362,10 @@ function displayElectionCreation(){
 	}));
 }
 
+
 /**
 * Display a confirmation screen enabling the user to confirm or modify again his election before validating.
+*
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election.
 * @param String description : the description of the election.
@@ -300,43 +397,12 @@ function electionConfirmation(name, deadline, description, participants){
 		}));
 }
 
-/**
-* Display the different aggregations possible for the given election.
-* @param Election election : the election concerned.
-*/
-function displayChooseAggregate(election){
-	$("#div2").empty();
-	$("#div2").append(paragraph("Show one of the following steps :"));
-	$("#div2").append(clickableElement("button", "Voting", function(){
-		$("#div2").empty();
-		displayChooseAggregate(election);
-		aggregateBallot(election);
-		}));
-	$("#div2").append(clickableElement("button", "Shuffle", function(){
-		$("#div2").empty();
-		displayChooseAggregate(election);
-		aggregateShuffle(election);
-		}));
-	$("#div2").append(clickableElement("button", "Decrypted", function(){
-		$("#div2").empty();
-		displayChooseAggregate(election);
-		if(election.stage < 2){
-			decryptBallots(election);
-		}else{
-			aggregateDecrypted(election);
-		}
-		}));
-	$("#div2").append(clickableElement("button", "Result", function(){
-		$("#div2").empty();
-		displayChooseAggregate(election);
-		// Here we should aggregate and show the final result.
-		}));
-}
 
 /**
 * Display a list of encrypted ballots in a grid. Three fields are displayed :
 * - The sciper of the voter.
 * - His encrypted ElGalmal pair [alpha, beta].
+*
 * @param Array[Ballot] box : a list of ballots. 
 */
 function displayBallotBox(box){
@@ -353,34 +419,15 @@ function displayBallotBox(box){
 		numberedBallots[i] = numberedBallot;
 	}
 
-	$("#div2").append(createGrid("gridDiv")); 
-
-	var randomID = ""+Math.floor(Math.random() * 1000000000)
-		
-	$('#gridDiv').w2grid({
-		name: randomID,
-		header: 'List of Ballots',
-		show: {
-		toolbar: true,
-		footer: true
-		},
-		columns: [
-		{ field: 'user', caption: 'Sciper', size: '60px', sortable: true, attr: 'align=center' },
-		{ field: 'alpha', caption: 'Alpha', size: '50%', sortable: true, resizable: true },
-		{ field: 'beta', caption: 'Beta', size: '50%', sortable: true, resizable: true }
-		],
-		searches: [
-		{ field: 'user', caption: 'Sciper', type: 'text' }
-		],
-		sortData: [{ field: 'user', direction: 'ASC' }],
-		records: numberedBallots
-	});
+	generateEncryptedBallotsGrid(numberedBallots);
 }
+
 
 /**
 * Display a list of shuffled ballots in a grid. Three fields are displayed :
 * - The sciper of the voter.
 * - His encrypted shuffled ElGalmal pair [alpha, beta].
+*
 * @param Array[Ballot] box : a list of ballots. 
 */
 function displayShuffledBox(box){
@@ -397,72 +444,13 @@ function displayShuffledBox(box){
 		numberedBallots[i] = numberedBallot;
 	}
 
-	$("#div2").append(createGrid("gridDiv")); 
-
-	var randomID = ""+Math.floor(Math.random() * 1000000000)
-		
-	$('#gridDiv').w2grid({
-		name: randomID,
-		header: 'List of shuffled ballots',
-		show: {
-		toolbar: true,
-		footer: true
-		},
-		columns: [
-		{ field: 'user', caption: 'Sciper', size: '60px', sortable: true, attr: 'align=center' },
-		{ field: 'alpha', caption: 'Alpha', size: '50%', sortable: true, resizable: true },
-		{ field: 'beta', caption: 'Beta', size: '50%', sortable: true, resizable: true }
-		],
-		searches: [
-		{ field: 'user', caption: 'Sciper', type: 'text' }
-		],
-		sortData: [{ field: 'user', direction: 'ASC' }],
-		records: numberedBallots
-	});
+	generateEncryptedBallotsGrid(numberedBallots);
 }
 
-/**
-* Display a list of decrypted ballots in a grid. Only the plain text of the ballot is displayed.
-* @param Array[Ballot] box : a list of ballots. 
-*/
-function displayDecryptedBox(box){
-
-	var numberedBallots = [];
-	for(var i = 0; i < box.length; i++){
-		var ballot = box[i];
-		var array = ballot.text;
-		var plain = array[0]+0x100*array[1]+0x10000*array[2];
-		var numberedBallot = {
-			recid: i,
-			text: plain
-		}
-		numberedBallots[i] = numberedBallot;
-	}
-
-	$("#div2").append(createGrid("gridDiv")); 
-
-	var randomID = ""+Math.floor(Math.random() * 1000000000)
-		
-	$('#gridDiv').w2grid({
-		name: randomID,
-		header: 'List of decrypted ballots',
-		show: {
-		toolbar: true,
-		footer: true
-		},
-		columns: [
-		{ field: 'text', caption: 'Plain Text', size: '100%', resizable: true },
-		],
-		searches: [
-		{ field: 'text', caption: 'Plain Text', type: 'text' },
-		],
-		sortData: [{ field: 'text', direction: 'ASC' }],
-		records: numberedBallots
-	});
-}
 
 /**
 * Inject the specified details in the inputs of the election creation.
+*
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election.
 * @param String description : the description of the election.
@@ -482,9 +470,12 @@ function injectElectionDetails(name, deadline, description, participants){
 	$("textarea[name='participants']").val(participantsString);
 }
 
+
 /**
 * Verify if a given string representing a SCIPER number is in the good format (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+*
 * @param String sciper : the string to verify.
+*
 * @return true if the given sciper matches the requirements, false otherwise.
 */
 function verifyValidSciper(sciper){
@@ -492,9 +483,12 @@ function verifyValidSciper(sciper){
 	return sciper.length == 6 && sciper.match(regex);
 }
 
+
 /**
 * Verify if a given string representing a date is in the good format (DD/MM/YYYY).
+*
 * @param String date : the string to verify.
+*
 * @return true if the given string matches the requirements, false otherwise
 */
 function verifyValidDate(date){
@@ -512,9 +506,12 @@ function verifyValidDate(date){
 	}
 }
 
+
 /**
 * Create a Date from the given string (which should be in the DD/MM/YYYY format).
+*
 * @param String string : the string to convert into a date.
+*
 * @return Date : a date from the given representation, null if the representation wasn't in a good format.
 */
 function createDateFromString(string){
@@ -527,6 +524,7 @@ function createDateFromString(string){
 	}
 }
 
+
 /**
 * Clear the display, the banner and the navigation bar are will not be affected by this operation.
 */
@@ -535,6 +533,7 @@ function clearDisplay(){
 	$("#div2").empty();
 	$("#errDiv").empty();
 }
+
 
 /**
 * Clear the navigation bar, the banner and the rest of the display will not be affected by this operation.

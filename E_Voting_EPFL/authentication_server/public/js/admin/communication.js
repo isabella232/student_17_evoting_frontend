@@ -3,13 +3,16 @@
 * Contains all the methods relative to the communication between the frontend and the cothority.
 */
 
+
 var socket;
 var userSciper;
 var recoveredElections;
 var sessionToken;
 
+
 /**
 * Send a Login message to the cothority, asking for available elections.
+*
 * @param loginRequest : a Login message as described in the proto file.
 */
 function sendLoginRequest(loginRequest){
@@ -31,8 +34,10 @@ function sendLoginRequest(loginRequest){
     
 }
 
+
 /**
 * Send an Open message to the cothority to create an election based on the informations entered by the user.
+*
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election, have to be in the format DD/MM/YYYY.
 * @param String description : the description of the election.
@@ -68,8 +73,10 @@ function createElection(name, deadline, description, participants){
 	});	
 }
 
+
 /**
 * Send a Shuffle message to the conodes, initiating the shuffle of the given election.
+*
 * @param Election election : the election to finalize.
 */
 function finalize(election){
@@ -90,8 +97,10 @@ function finalize(election){
 	});
 }
 
+
 /**
 * Send a Decrypt message to the conodes, initiating the decryption of the ballots.
+*
 * @param Election election : the election of which we want to decrypt the ballots.
 */
 function decryptBallots(election){
@@ -104,11 +113,48 @@ function decryptBallots(election){
 		$("#div2").append(displayDecryptedBox(data.decrypted.ballots));
 	}).catch((err) => {
 		console.log(err);
-	});;
+	});
 }
+
+
+/**
+* Contacts the cothority to get the decrypted results of the election and then display them.
+*
+* @param Election election : the election from which we want to get the result.
+*/
+function decryptAndDisplayElectionResult(election){
+
+	if(election.stage < 2){
+
+		var decryptBallotsMessage = {
+			token: sessionToken,
+			genesis: election.id
+		}
+		socket.send('Decrypt', 'DecryptReply', decryptBallotsMessage).then((data) => {
+			election.stage = 2;
+			displayElectionResult(election, data.decrypted.ballots);
+		}).catch((err) => {
+			console.log(err);
+		});
+
+	}else{
+		var aggregateDecryptedMessage = {
+			token : sessionToken,
+			genesis : election.id,
+			type : 2
+		}
+		socket.send('Aggregate', 'AggregateReply', aggregateDecryptedMessage).then((data) => {
+			displayElectionResult(election, data.box.ballots);
+		}).catch((err) => {
+			console.log(err);
+		});
+	}
+}
+
 
 /**
 * Send an aggregate message to the conodes to aggregate the encrypted ballots.
+*
 * @param Election election : the election of which we want to aggregate the ballots.
 */
 function aggregateBallot(election){
@@ -125,8 +171,10 @@ function aggregateBallot(election){
 	});
 }
 
+
 /**
 * Send an aggregate message to the conodes to aggregate the encrypted and shuffled ballots.
+*
 * @param Election election : the election of which we want to aggregate the ballots.
 */
 function aggregateShuffle(election){
@@ -143,8 +191,10 @@ function aggregateShuffle(election){
 	});
 }
 
+
 /**
 * Send an aggregate message to the conodes to aggregate the decrypted ballots.
+*
 * @param Election election : the election of which we want to aggregate the ballots.
 */
 function aggregateDecrypted(election){
@@ -161,9 +211,11 @@ function aggregateDecrypted(election){
 	});
 }
 
+
 /**
 * Election comparator.
 * An election is considered superior to another if its end date is after the other election's end date.
+*
 * @param election1 : the first election.
 * @param election2 : the second election.
 * @return the result of the comparison between the two end dates.
