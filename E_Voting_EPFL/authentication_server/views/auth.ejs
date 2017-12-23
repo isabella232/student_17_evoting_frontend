@@ -1,17 +1,14 @@
 <!-- Authentication page, the user is redirected here after being successfully authenticated with Tequila
-    This page redirects the client to its original location with a signed message of his informations -->
+    This page redirects the client to its original location with a signed message of his informations.
+    The client location is stored is the configuration file of the server. -->
 
 <!DOCTYPE html>
 <html>
 
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="./../server_config.ini"></script>
         <script>
-            
-            // Future location
-            //const client_location = "http://www.voting.epfl.ch";
-            
-            const client_location = "html/web_client.html";
             
             $('document').ready(function(){
                 //If we want to add section, groups and date.
