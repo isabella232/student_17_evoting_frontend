@@ -70,7 +70,7 @@ function unclickableButton(textToDisplay, color){
 *
 * @return HTML Element : a division with the given id.
 */
-function createDiv(id){
+function createCenteredDiv(id){
 	var element = document.createElement("div");
 	element.id = id;
 	element.style.textAlign = "left";

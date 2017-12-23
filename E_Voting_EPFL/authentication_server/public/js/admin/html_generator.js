@@ -122,7 +122,7 @@ function displayElectionListItem(election){
 function displayElectionFull(election){
 	clearDisplay();	
 
-	$("#div1").append(createDiv("details"));
+	$("#div1").append(createCenteredDiv("details"));
 
 	$("#details").append("<h2>"+election.name+"</h2>");
 
@@ -208,18 +208,19 @@ function displayAggregateButtonSet(election){
 */
 function displayChooseAggregate(election){
 	$("#div2").empty();
-	$("#div2").append(paragraph("Show one of the following steps :"));
-	$("#div2").append(clickableElement("button", "Voting", function(){
+	$("#div2").append(createCenteredDiv("select"));
+	$("#select").append(paragraph("Show one of the following steps :"));
+	$("#select").append(clickableElement("button", "Voting", function(){
 		$("#div2").empty();
 		displayChooseAggregate(election);
 		aggregateBallot(election);
 		}));
-	$("#div2").append(clickableElement("button", "Shuffle", function(){
+	$("#select").append(clickableElement("button", "Shuffle", function(){
 		$("#div2").empty();
 		displayChooseAggregate(election);
 		aggregateShuffle(election);
 		}));
-	$("#div2").append(clickableElement("button", "Result", function(){
+	$("#select").append(clickableElement("button", "Result", function(){
 		$("#div2").empty();
 		displayChooseAggregate(election);
 		decryptAndDisplayElectionResult(election);
@@ -306,7 +307,7 @@ function displayElections(elections){
 function displayElectionCreation(){
 	clearDisplay();
 	var numberParticipants = 0;
-	$("#div1").append(createDiv("details"));
+	$("#div1").append(createCenteredDiv("details"));
 	$("#details").append(paragraph("Here you can create an election."));
 	$("#details").append("<form>");
 	$("#details").append("Election name :<br>");
@@ -333,7 +334,7 @@ function displayElectionCreation(){
 		if(!verifyValidDate(deadline)){
 			$("#errDiv").append(paragraph("The date does not satisfy at least one of the requirements."));
 			$("#errDiv").append(paragraph("The date should respect the format DD/MM/YYYY, be a valid date,"));
-			$("#errDiv").append(paragraph("and no past date are allowed."));
+			$("#errDiv").append(paragraph("and no date before tomorrow are allowed."));
 			errors = true;
 		}
 		
@@ -373,7 +374,7 @@ function displayElectionCreation(){
 */
 function electionConfirmation(name, deadline, description, participants){
 	clearDisplay();
-	$("#div1").append(createDiv("details"));
+	$("#div1").append(createCenteredDiv("details"));
 
 	$("#details").append(paragraph("Your election is ready to be created,"));
 	$("#details").append(paragraph("Please verify the validity of the informations and then validate."));
@@ -472,15 +473,16 @@ function injectElectionDetails(name, deadline, description, participants){
 
 
 /**
-* Verify if a given string representing a SCIPER number is in the good format (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+* Verify if a given string representing a SCIPER number is in the good format (ABCDEF) of (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
 *
 * @param String sciper : the string to verify.
 *
 * @return true if the given sciper matches the requirements, false otherwise.
 */
 function verifyValidSciper(sciper){
-	var regex = /(\d\d\d\d\d\d)/;
-	return sciper.length == 6 && sciper.match(regex);
+	var regex6 = /(\d\d\d\d\d\d)/;
+	var regex7 = /(\d\d\d\d\d\d\d)/;
+	return (sciper.length == 6 && sciper.match(regex6)) || (sciper.length == 7 && sciper.match(regex7));
 }
 
 
@@ -498,9 +500,13 @@ function verifyValidDate(date){
 		var day = splitted[0];
 		var month = splitted[1];
 		var year = splitted[2];
-		var genDate = new Date(year, month, day);
+		var genDate = new Date(year, month - 1, day);
+
+		var today = new Date();
+	
+
 		//Very basic check for now, can be upgraded.
-		return 1 <= month && month <= 12 && 1 <= day && day <= 31 && genDate > new Date();
+		return 1 <= month && month <= 12 && 1 <= day && day <= 31 && genDate > today;
 	}else{
 		return false;
 	}

@@ -3,13 +3,16 @@
 * Contains all the methods relative to the communication between the frontend and the cothority.
 */
 
+
 var socket;
 var userSciper;
 var recoveredElections;
 var sessionToken;
 
+
 /**
 * Send a Login message to the cothority, asking for available elections.
+*
 * @param loginRequest : a Login message as described in the proto file.
 */
 function sendLoginRequest(loginRequest){
@@ -26,8 +29,10 @@ function sendLoginRequest(loginRequest){
     
 }
 
+
 /**
 * Send a Cast message to the election. An encrypted ballot is sended with the given choice in it.
+*
 * @param election : the elections we want to vote in.
 * @param choice : the choice of the user in the election.
 */
@@ -68,11 +73,14 @@ function submitVote(election, choice){
 	});
 }
 
+
 /**
 * Election comparator.
 * An election is considered superior to another if its end date is after the other election's end date.
+*
 * @param election1 : the first election.
 * @param election2 : the second election.
+*
 * @return the result of the comparison between the two end dates.
 */
 function compareByDate(election1, election2){

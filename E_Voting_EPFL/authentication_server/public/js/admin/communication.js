@@ -90,7 +90,7 @@ function finalize(election){
 
 	socket.send("Shuffle", "ShuffleReply", finalizeMessage).then((data) => {
 		$("#div2").empty();
-		election.data = new Uint8Array([1]);
+		election.stage = 1;
 		displayElectionFull(election);
 	}).catch((err) => {
 		console.log(err);

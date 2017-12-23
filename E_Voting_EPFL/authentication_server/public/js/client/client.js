@@ -4,6 +4,7 @@
 * The web page is a single page application where the update of the content is made through jQuery.
 */
 
+
 $('document').ready(function(){
    
     socket = new dedis.net.Socket(node, messages);
@@ -49,6 +50,7 @@ $('document').ready(function(){
     }
 });
 
+
 /**
 * Redirects the user to the authentication server.
 */
@@ -56,6 +58,11 @@ function authenticate(){
     window.location.replace(authenticationServerAuth);
 }
 
+
+/**
+* Log the client out.
+* Drops the session cookie and redirects the client to the welcome page.
+*/
 function logout(){
 	userSciper = null;
 	sessionToken = null;
@@ -65,6 +72,10 @@ function logout(){
         displayWelcomePage();
 }
 
+
+/**
+* Mock the authentication with the given sciper.
+*/
 function mockAuthentication(sciper){
 	userSciper = sciper;
 	const loginRequest = {

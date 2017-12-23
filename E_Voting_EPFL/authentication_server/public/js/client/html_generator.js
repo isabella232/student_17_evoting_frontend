@@ -3,6 +3,7 @@
 * Contains all the methods that allows to inject HTML in the document.
 */
 
+
 /**
 * Inject the banner with the EPFL logo and the name of the application.
 */
@@ -11,12 +12,14 @@ function showBanner(){
     	$("#banner").append("<h2 id='banner_text'>EPFL E-Voting </h2>");
 }
 
+
 /**
 * Inject the navigation bar for a disconnected user.
 */
 function showNavDisconnected(){
 	clearNavigation();
 }
+
 
 /**
 * Inject the navigation bar for a connected user.
@@ -31,6 +34,7 @@ function showNavConnected(){
 		}));
 	$("#user_infos").append(paragraph("Hi "+userSciper));
 }
+
 
 /**
 * Inject a welcome text when a client arrives unlogged on the web page.
@@ -58,8 +62,10 @@ function displayWelcomePage(){
 		}));
 }
 
+
 /**
 * Display an election list item and associate an OnClickListener to it.
+*
 * @param Election election : the election to display as a list item.
 */
 function displayElectionListItem(election){
@@ -87,8 +93,10 @@ function displayElectionListItem(election){
 	$("#div1").append(separationLine());
 }
 
+
 /**
 * Display all the informations of a given election and the radio buttons showing the possible votes.
+*
 * @param Election election : the election to display.
 */
 function displayElectionFull(election){
@@ -111,7 +119,7 @@ function displayElectionFull(election){
 		$("#details").append(paragraph("Description : "+election.description));
 	}
 
-	//if(createDateFromString(election.end) >= new Date()){
+	if(createDateFromString(election.end) >= new Date()){
 
 		$("#details").append("<form>");
 
@@ -127,14 +135,16 @@ function displayElectionFull(election){
 			var selectedSciper = Number($("input[type='radio'][name='choice']:checked").val());
 			submitVote(election, selectedSciper);
 			}));
-	//}else{
-	//	$("#details").append(h3("The vote for this election is over."));
+	}else{
+		$("#details").append(h3("The vote for this election is over."));
 		//Should show the result
-	//}
+	}
 }
+
 
 /**
 * Display all elections available in a list.
+*
 * @param Array{Election} elections : the election list to display.
 */
 function displayElections(elections){
@@ -154,19 +164,26 @@ function displayElections(elections){
 	}
 }
 
+
 /**
-* Verify if a given string representing a SCIPER number is in the good format (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+* Verify if a given string representing a SCIPER number is in the good format (ABCDEF) of (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+*
 * @param String sciper : the string to verify.
+*
 * @return true if the given sciper matches the requirements, false otherwise.
 */
 function verifyValidSciper(sciper){
-	var regex = /(\d\d\d\d\d\d)/;
-	return sciper.length == 6 && sciper.match(regex);
+	var regex6 = /(\d\d\d\d\d\d)/;
+	var regex7 = /(\d\d\d\d\d\d\d)/;
+	return (sciper.length == 6 && sciper.match(regex6)) || (sciper.length == 7 && sciper.match(regex7));
 }
+
 
 /**
 * Verify if a given string representing a date is in the good format (DD/MM/YYYY).
+*
 * @param String date : the string to verify.
+*
 * @return true if the given string matches the requirements, false otherwise
 */
 function verifyValidDate(date){
@@ -174,9 +191,12 @@ function verifyValidDate(date){
 	return date.length == 10 && date.match(regex);
 }
 
+
 /**
 * Create a Date from the given string (which should be in the DD/MM/YYYY format).
+*
 * @param String string : the string to convert into a date.
+*
 * @return Date : a date from the given representation, null if the representation wasn't in a good format.
 */
 function createDateFromString(string){
@@ -189,6 +209,7 @@ function createDateFromString(string){
 	}
 }
 
+
 /**
 * Clear the display, the banner and the navigation bar are will not be affected by this operation.
 */
@@ -197,6 +218,7 @@ function clearDisplay(){
 	$("#div2").empty();
 	$("#errDiv").empty();
 }
+
 
 /**
 * Clear the navigation bar, the banner and the rest of the display will not be affected by this operation.

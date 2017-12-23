@@ -3,12 +3,15 @@
 * Allows to generate elements with associated functions.
 */
 
+
 /**
 * Create a clickable element with a given type.
+*
 * @param String elementType : the type of the element to create.
 * @param String textToDisplay : the text to display on the element.
 * @param Function onClick : the function to execute when clicking on the created element.
 * @param String className : name of class to add to the element.
+*
 * @return HTML Element : an element with the given attributes.
 */
 function clickableElement(elementType, textToDisplay, onClick, className){
@@ -22,9 +25,12 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 	return element;
 }
 
+
 /**
 * Create a division with the given ID and a text alignment set to left.
+*
 * @param id : the id of the new division.
+*
 * @return HTML Element : a division with the given id.
 */
 function createDiv(id){
@@ -36,9 +42,12 @@ function createDiv(id){
 	return element;
 }
 
+
 /**
 * Return a paragraph element with the given text.
+*
 * @param String textToDisplay : the text to display in the paragraph.
+*
 * @return HTMLParagraphElement an element representing a paragraph with the given text.
 */
 function paragraph(textToDisplay) {
@@ -47,9 +56,12 @@ function paragraph(textToDisplay) {
     return element;
 }
 
+
 /**
 * Return a header h2 with the given text.
+*
 * @param String textToDisplay : the text to insert in the header.
+*
 * @return HTMLH2Element an element representing a header h2 element with the given text.
 */
 function h2(textToDisplay) {
@@ -58,9 +70,12 @@ function h2(textToDisplay) {
     return element;
 }
 
+
 /**
 * Return a header h3 with the given text.
+*
 * @param String textToDisplay : the text to insert in the header.
+*
 * @return HTMLH3Element an element representing a header h3 element with the given text.
 */
 function h3(textToDisplay) {
@@ -69,9 +84,12 @@ function h3(textToDisplay) {
     return element;
 }
 
+
 /**
 * Return a header h4 with the given text.
+*
 * @param String textToDisplay : the text to insert in the header.
+*
 * @return HTMLH4Element an element representing a header h4 element with the given text.
 */
 function h4(textToDisplay) {
@@ -80,9 +98,11 @@ function h4(textToDisplay) {
     return element;
 }
 
+
 /**
 * Returns an element representing a separation line.
 * The specificities of this line can be found in the css class "underlined".
+*
 * @return HTMLDivElement an element representing a separation line.
 */
 function separationLine(){
