@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+    
+        <title>E-Voting EPFL</title>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./../js/admin/html_generator.js"></script>
+	<script src="./../js/admin/grid_generator.js"></script>
+        <script src="./../js/admin/dom.js"></script>
+	<script src="./../js/admin/communication.js"></script>
+        <script src="./../js/admin/admin.js"></script>
+	<script src="./../config/config.ini"></script>
+        <script src="./../lib/bundle.min.js"></script>
+        <script src="./../lib/skeleton.js"></script>
+	<script src="./../lib/w2ui-1.5.rc1.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="./../lib/w2ui-1.5.rc1.min.css">
+        <link rel="stylesheet" type="text/css" href="./../css/client.css">
+        
+        <meta charset="UTF-8">
+    
+    </head>
+    
+    <body>
+        
+        <div class="row" id="banner"></div>
+	<div class="row" id="nav">
+		<div class="clickable" id="nav_election_list"></div>
+		<div class="clickable" id="nav_create_election"></div>
+		<div class="clickable" id="logout"></div>
+		<div id="user_infos"></div>
+	</div>
+        <div class="row centered" id="div1"></div>
+        <div class="row centered" id="div2"></div>
+        <div class="row centered" id="errDiv"></div>
+    
+    </body>
+
+</html>
