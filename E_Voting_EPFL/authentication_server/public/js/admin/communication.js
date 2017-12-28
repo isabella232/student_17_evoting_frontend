@@ -15,9 +15,15 @@ var sessionToken;
 *
 * @param loginRequest : a Login message as described in the proto file.
 */
-function sendLoginRequest(loginRequest){
-    
-    socket.send('Login', 'LoginReply', loginRequest).then((data) => {
+function sendLoginRequest(sciper, signature){
+
+	const loginRequest = {
+		master : masterPin,
+		user : sciper,
+		signature : signature
+	}
+
+	socket.send('Login', 'LoginReply', loginRequest).then((data) => {
 	if(data.admin){
 		clearDisplay();
 		showNavConnected();
@@ -28,9 +34,9 @@ function sendLoginRequest(loginRequest){
 	}else{
 		$("#errDiv").append(paragraph("An admin account is required to access this site."));
 	}
-    }).catch((err) => {
-        console.log(err);
-    });
+	}).catch((err) => {
+		console.log(err);
+	});
     
 }
 

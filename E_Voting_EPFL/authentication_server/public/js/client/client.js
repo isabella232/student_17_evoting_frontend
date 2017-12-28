@@ -1,7 +1,7 @@
 /**
 * Client.
-* Defines the behavior of the client.
-* The web page is a single page application where the update of the content is made through jQuery.
+* This is the main of the project, the code executed when the user connects.
+* The web page is a single page application where the updates of the content is made through jQuery.
 */
 
 
@@ -39,13 +39,7 @@ $('document').ready(function(){
         var signature = message[1];
         $('#div1').append(paragraph("Connecting, please wait ..."));
        
-        const loginRequest = {
-            master : masterPin,
-            user : id,
-            signature : new Uint8Array([])
-        }
-        
-        sendLoginRequest(loginRequest);
+        sendLoginRequest(id, new Uint8Array([]));
 		
     }
 });
@@ -61,7 +55,7 @@ function authenticate(){
 
 /**
 * Log the client out.
-* Drops the session cookie and redirects the client to the welcome page.
+* Drops the session cookie and display the welcome page.
 */
 function logout(){
 	userSciper = null;
@@ -75,14 +69,15 @@ function logout(){
 
 /**
 * Mock the authentication with the given sciper.
+*
+* @param sciper : the sciper of which we want to mock the authentication.
 */
 function mockAuthentication(sciper){
+	if(typeof sciper != 'number'){
+		throw new TypeError('The sciper should be a number');
+	}
+
 	userSciper = sciper;
-	const loginRequest = {
-            master : masterPin,
-            user : userSciper,
-            signature : new Uint8Array([])
-        }
         
-        sendLoginRequest(loginRequest);
+        sendLoginRequest(userSciper, new Uint8Array([]));
 }

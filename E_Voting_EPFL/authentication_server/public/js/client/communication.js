@@ -15,17 +15,23 @@ var sessionToken;
 *
 * @param loginRequest : a Login message as described in the proto file.
 */
-function sendLoginRequest(loginRequest){
+function sendLoginRequest(sciper, signature){
+
+	const loginRequest = {
+            master : masterPin,
+            user : sciper,
+            signature : signature
+        }
     
-    socket.send('Login', 'LoginReply', loginRequest).then((data) => {
-        clearDisplay();
-	sessionToken = data.token;
-	recoveredElections = data.elections;
-	recoveredElections = recoveredElections.sort(compareByDate);
-	displayElections(recoveredElections);
-    }).catch((err) => {
-        console.log(err);
-    });
+	socket.send('Login', 'LoginReply', loginRequest).then((data) => {
+		clearDisplay();
+		sessionToken = data.token;
+		recoveredElections = data.elections;
+		recoveredElections = recoveredElections.sort(compareByDate); //Sort election by deadlines.
+		displayElections(recoveredElections);
+	}).catch((err) => {
+		console.log(err);
+	});
     
 }
 
@@ -45,7 +51,7 @@ function submitVote(election, choice){
 	tmp = tmp >> 8;
 	var n2 = tmp & 0xFF;
 	
-	//Least significant byte first.
+	/* Least significant byte first. */
 	var messageToEncrypt = new Uint8Array([n0, n1, n2]);
 
 	var point = dedis.crypto.unmarshal(election.key);
@@ -55,15 +61,15 @@ function submitVote(election, choice){
 	var beta = dedis.crypto.marshal(encryptedMessage.Beta);
 	
 	var ballot = {
-	user : userSciper,
-	alpha : alpha,
-	beta : beta
+		user : userSciper,
+		alpha : alpha,
+		beta : beta
 	}
 
 	var castMessage = {
-	    token : sessionToken,
-	    genesis : election.id, 
-	    ballot : ballot
+		token : sessionToken,
+		genesis : election.id, 
+		ballot : ballot
 	}
         
 	socket.send('Cast', 'CastReply', castMessage).then((data) => {
