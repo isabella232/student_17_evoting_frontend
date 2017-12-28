@@ -41,15 +41,17 @@ function sendLoginRequest(loginRequest){
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election, have to be in the format DD/MM/YYYY.
 * @param String description : the description of the election.
-* @param Array[String] participants : the list of the participants to the election.
+* @param Uint32[] participants : the list of the participants of the election.
+* @param Uint32[] voters : the list of the voter of the election.
 */
-function createElection(name, deadline, description, participants){
+function createElection(name, deadline, description, participants, voters){
 
 	var newElection = {
 		name : name,
 		creator : userSciper,
-		users : participants,
+		users : voters,
 		stage : 0,
+		data : votersToUint8Array(participants),
 		description : description,
 		end : deadline
 	}
@@ -71,6 +73,20 @@ function createElection(name, deadline, description, participants){
 	}).catch((err) => {
 		console.log(err);	
 	});	
+}
+
+
+function votersToUint8Array(voters){
+	var transVoters = [];
+	for(var i = 0; i < voters.length; i++){
+		var voter = voters[i];
+		transVoters[3*i] = voter & 0xFF;
+		voter = voter >> 8;
+		transVoters[3*i + 1] = voter & 0xFF;
+		voter = voter >> 8;
+		transVoters[3*i + 2] = voter & 0xFF;
+	}
+	return transVoters;
 }
 
 

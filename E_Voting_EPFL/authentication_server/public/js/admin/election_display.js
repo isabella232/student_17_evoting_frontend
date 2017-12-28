@@ -83,6 +83,16 @@ function displayElectionFull(election){
 		$("#details").append(paragraph("Description : "+election.description));
 	}
 
+	var participantsString = "";
+	var participants = uint8ArrayToScipers(election.data);
+	for(var i=0; i < participants.length; i++){
+		participantsString += participants[i];
+		if(i != participants.length - 1){
+			participantsString += ", ";
+		}
+	}
+	$("#details").append(paragraph("Participants : "+participantsString));
+
 	var usersString = "";
 	for(var i=0; i < election.users.length; i++){
 		usersString += election.users[i];
@@ -90,7 +100,7 @@ function displayElectionFull(election){
 			usersString += ", ";
 		}
 	}
-	$("#details").append(paragraph("Participants : "+usersString));
+	$("#details").append(paragraph("Voters : "+usersString));
 
 	if(createDateFromString(election.end) >= new Date()){
 		//End date not reached yet
@@ -103,6 +113,20 @@ function displayElectionFull(election){
 			displayAggregateButtonSet(election);
 		}
 	}
+}
+
+
+/**
+* Turns a uint8Array into a uint32Array representing the scipers.
+* 
+* @param array the array to convert 
+*/
+function uint8ArrayToScipers(array){
+	var recovered = [];
+	for(var i = 0; 3*i < array.length; i ++){
+		recovered[i] = array[3*i] + array[3*i + 1] * 0x100 + array[3*i + 2] * 0x10000;
+	}
+	return recovered;
 }
 
 

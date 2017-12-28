@@ -124,8 +124,9 @@ function displayElectionFull(election){
 		$("#details").append("<form>");
 
 		//Election not finished yet
-		for(var i = 0; i < election.users.length; i++){
-		var user = election.users[i];
+		var choices = uint8ArrayToScipers(election.data);
+		for(var i = 0; i < choices.length; i++){
+		var user = choices[i];
 		$("#details").append("<input type='radio' name='choice' value='"+user+"'>"+user+"</input>");
 		$("#details").append("<br>");
 		}
@@ -144,6 +145,20 @@ function displayElectionFull(election){
 			decryptAndDisplayElectionResult(election)
 		}
 	}
+}
+
+
+/**
+* Turns a uint8Array into a uint32Array representing the scipers.
+* 
+* @param array the array to convert 
+*/
+function uint8ArrayToScipers(array){
+	var recovered = [];
+	for(var i = 0; 3*i < array.length; i ++){
+		recovered[i] = array[3*i] + array[3*i + 1] * 0x100 + array[3*i + 2] * 0x10000;
+	}
+	return recovered;
 }
 
 

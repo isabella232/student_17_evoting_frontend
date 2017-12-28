@@ -21,6 +21,8 @@ function displayElectionCreation(){
 	$("#details").append("<textarea name='description' cols='40' rows='5' placeholder='Add a description'></textarea><br><br>");
 	$("#details").append("Participants :<br>");
 	$("#details").append("<textarea name='participants' cols='40' rows='5' placeholder='Write one sciper per line'></textarea><br><br>");
+	$("#details").append("Voters :<br>");
+	$("#details").append("<textarea name='voters' cols='40' rows='5' placeholder='Write one sciper per line'></textarea><br><br>");
 	$("#details").append("</form>");
 
 	$("#details").append(clickableElement("button", "Finish", function(){
@@ -58,10 +60,27 @@ function displayElectionCreation(){
 				$("#errDiv").append(paragraph("The participant number "+(i+1)+" is not well written."));
 				errors = true;
 			}
+		}
+
+		var votersString = ($("textarea[name='voters']").val()).split('\n');
+		if(votersString.length == 0){
+			$("#errDiv").append(paragraph("Please add some voters to the election."));
+			errors = true;
+		}
+		
+		var voters = [];
+
+		for(var i = 0; i < votersString.length; i++){
+			if(verifyValidSciper(votersString[i])){
+				voters[i] = Number(votersString[i]);
+			}else{
+				$("#errDiv").append(paragraph("The voter number "+(i+1)+" is not well written."));
+				errors = true;
+			}
 		}		
 
 		if(!errors){
-			electionConfirmation(name, deadline, description, participants);
+			electionConfirmation(name, deadline, description, participants, voters);
 		}
 	}));
 }
@@ -73,9 +92,11 @@ function displayElectionCreation(){
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election.
 * @param String description : the description of the election.
-* @param Uint8Array participants : the list of the scipers of the participants to the election.
+* @param Number[] participants : the list of the scipers of the participants of the election.
+* @param Number[] voters : the list of the scipers of the voters of the election. 
 */
-function electionConfirmation(name, deadline, description, participants){
+function electionConfirmation(name, deadline, description, participants, voters){
+
 	clearDisplay();
 	$("#div1").append(createCenteredDiv("details"));
 
@@ -86,18 +107,25 @@ function electionConfirmation(name, deadline, description, participants){
 	$("#details").append(paragraph("Deadline : "+deadline));
 	$("#details").append(paragraph("Creator : "+userSciper));
 	$("#details").append(paragraph("Description : "+description));
+
 	$("#details").append("Participants :<br>");
-	var participantSciper;
 	for(var i = 0; i < participants.length; i++){
 		$("#details").append(participants[i]+"<br>");
 	}
+	$("#details").append(paragraph(""));
+
+	$("#details").append("Voters :<br>");
+	for(var i = 0; i < voters.length; i++){
+		$("#details").append(voters[i]+"<br>");
+	}
+	$("#details").append(paragraph(""));
 
 	$("#details").append(clickableElement("button", "Create", function(){
-		createElection(name, deadline, description, participants);
+		createElection(name, deadline, description, participants, voters);
 		}));
 	$("#details").append(clickableElement("button", "Modify", function(){
 		displayElectionCreation();
-		injectElectionDetails(name, deadline, description, participants);
+		injectElectionDetails(name, deadline, description, participants, voters);
 		}));
 }
 
@@ -108,12 +136,14 @@ function electionConfirmation(name, deadline, description, participants){
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election.
 * @param String description : the description of the election.
-* @param Uint8Array participants : the scipers of the participants.
+* @param Number[] participants : the scipers of the participants.
+* @param Number[] voters : the scipers of the voters.
 */
-function injectElectionDetails(name, deadline, description, participants){
+function injectElectionDetails(name, deadline, description, participants, voters){
 	$("input[type='text'][name='name']").val(name);
 	$("input[type='text'][name='deadline']").val(deadline);
 	$("textarea[name='description']").val(description);
+
 	var participantsString = "";
 	for(var i = 0; i < participants.length; i++){
 		participantsString += ""+participants[i];
@@ -122,4 +152,13 @@ function injectElectionDetails(name, deadline, description, participants){
 		}
 	}
 	$("textarea[name='participants']").val(participantsString);
+
+	var votersString = "";
+	for(var i = 0; i < voters.length; i++){
+		votersString += ""+voters[i];
+		if(i != voters.length - 1){
+			votersString += "\n";
+		}
+	}
+	$("textarea[name='voters']").val(votersString);
 }
