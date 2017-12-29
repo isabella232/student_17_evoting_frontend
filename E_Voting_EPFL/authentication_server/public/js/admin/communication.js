@@ -75,7 +75,7 @@ function createElection(name, deadline, description, participants, voters){
 		    signature : new Uint8Array([])
 		}
 		/* Return on election list. */
-		sendLoginRequest(loginRequest);
+		sendLoginRequest(userSciper, new Uint8Array([]));
 	}).catch((err) => {
 		console.log(err);	
 	});	
@@ -90,14 +90,10 @@ function createElection(name, deadline, description, participants, voters){
 * @return Number[] the transformed array.
 *
 * @throw TypeError if voters is invalid.
-* @throw RangeError if the length of the voters array is not divisible by 3.
 */
 function votersToUint8Array(voters){
 	if(typeof voters != 'object' || typeof voters.length != 'number'){
 		throw new TypeError('The voters given as argument is not a valid array.');
-	}
-	if(voters.length % 3 != 0){
-		throw new RangeError('The size of the voters array is not divisible by 3, hence the array is not valid.');
 	}
 
 	var transVoters = [];
