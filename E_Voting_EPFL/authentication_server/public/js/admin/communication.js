@@ -135,7 +135,7 @@ function finalize(election){
 		genesis : election.id
 	}
 
-	$("#div2").append("Please wait while the election is being finalized");
+	$("#div2").append("Please wait while the election is being shuffled.");
 
 	socket.send("Shuffle", "ShuffleReply", finalizeMessage).then((data) => {
 		$("#div2").empty();

@@ -34,7 +34,7 @@ function generateResultGrid(results){
 	}
 	/* End type check. */
 
-	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
+	$("#div2").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
 
 	$("#div2").append(createGrid("gridDiv")); 
 		
@@ -84,7 +84,7 @@ function generateEncryptedBallotsGrid(ballots){
 	}
 	/* End type check. */
 
-	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
+	$("#div2").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
 
 	$("#div2").append(createGrid("gridDiv")); 
 		

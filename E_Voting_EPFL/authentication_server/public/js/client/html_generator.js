@@ -178,8 +178,8 @@ function displayElectionFull(election){
 		/* Election finished, the user can't vote anymore. */
 		$("#details").append(h3("The vote for this election is over."));
 		if(election.stage < 2){
-			$("#details").append(h3("Please wait for the administrator of the election to finalize it."));
-			$("#details").append(h3("The result will then be displayed here"));
+			$("#details").append(h4("Please wait for the administrator of the election to finalize it."));
+			$("#details").append(h4("The result will then be displayed here"));
 		}else{
 			decryptAndDisplayElectionResult(election)
 		}
