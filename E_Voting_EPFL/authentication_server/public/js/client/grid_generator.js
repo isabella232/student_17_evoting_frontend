@@ -5,14 +5,14 @@
 */
 
 
-// This number will generate unique IDs for all grids.
+/* This number will generate unique IDs for all grids. */
 var id = 0;
 
 
 /**
 * Generates a grid for the results of an election.
 * 
-* @param Object[] results : an array representing the election results.
+* @param Ballot[] results : an array representing the election results.
 * Each object in the results array should have the following fields : 
 * - Number recid : which should be unique for each object.
 * - String sciper : the sciper of a participant of the election.
@@ -22,6 +22,7 @@ var id = 0;
 * @throw TypeError if at least one of the ballots does not respect the desired format.
 */
 function generateResultGrid(results){
+	/* Type check. */
 	if(typeof result != 'object' || typeof result.length != 'number'){
 		throw new TypeError('The given results is not an array.');
 	}
@@ -31,6 +32,7 @@ function generateResultGrid(results){
 			throw new TypeError('At least one of the ballots does not respect the desired format.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 
@@ -60,7 +62,7 @@ function generateResultGrid(results){
 /**
 * Generate a grid to represent encrypted ballots.
 *
-* @param Object[] ballots : the ballots to display.
+* @param Ballot[] ballots : the ballots to display.
 * The ballots should have the following fields :
 * - Number user : the sciper of a participant of the election.
 * - String alpha : the alpha field of the ElGamal encryption of the ballot.
@@ -70,6 +72,7 @@ function generateResultGrid(results){
 * @throw TypeError if one of the ballots does not respect the desired format.
 */
 function generateEncryptedBallotsGrid(ballots){
+	/* Type check. */
 	if(typeof result != 'object' || typeof result.length != 'number'){
 		throw new TypeError('The given results is not an array.');
 	}
@@ -79,6 +82,7 @@ function generateEncryptedBallotsGrid(ballots){
 			throw new TypeError('At least one of the ballots does not respect the desired format.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 

@@ -13,7 +13,8 @@ var sessionToken;
 /**
 * Send a Login message to the cothority, asking for available elections.
 *
-* @param loginRequest : a Login message as described in the proto file.
+* @param Number sciper : the sciper of the user who wants to log in.
+* @param Byte[] signature : the signature of the authentication server.
 */
 function sendLoginRequest(sciper, signature){
 
@@ -25,6 +26,7 @@ function sendLoginRequest(sciper, signature){
 
 	socket.send('Login', 'LoginReply', loginRequest).then((data) => {
 		if(data.admin){
+			/* The user is a confirmed admin. */
 			clearDisplay();
 			showNavConnected();
 			sessionToken = data.token;
@@ -32,9 +34,11 @@ function sendLoginRequest(sciper, signature){
 			recoveredElections = recoveredElections.sort(compareByDate);
 			displayElections(recoveredElections);
 		}else{
+			/* The user is not an admin. */
 			$("#errDiv").append(paragraph("An admin account is required to access this site."));
 		}
 	}).catch((err) => {
+		displayError('An error occured during the login, please try again later.');
 		console.log(err);
 	});
     
@@ -77,13 +81,14 @@ function createElection(name, deadline, description, participants, voters){
 		/* Return on election list. */
 		sendLoginRequest(userSciper, new Uint8Array([]));
 	}).catch((err) => {
+		displayError('An error occured during the creation of the election.');
 		console.log(err);	
 	});	
 }
 
 
 /**
-* Recover scipers from Uint8Array.
+* Recover scipers from byte array.
 *
 * @param Bytes[] voters, the array to transform.
 *
@@ -92,9 +97,11 @@ function createElection(name, deadline, description, participants, voters){
 * @throw TypeError if voters is invalid.
 */
 function votersToUint8Array(voters){
+	/* Type check. */
 	if(typeof voters != 'object' || typeof voters.length != 'number'){
 		throw new TypeError('The voters given as argument is not a valid array.');
 	}
+	/* End type check. */
 
 	var transVoters = [];
 	for(var i = 0; i < voters.length; i++){
@@ -117,9 +124,11 @@ function votersToUint8Array(voters){
 * @throw TypeError if the id field of election is not valid.
 */
 function finalize(election){
+	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
 	}
+	/* End type check. */
 
 	var finalizeMessage = {
 		token : sessionToken,
@@ -133,6 +142,7 @@ function finalize(election){
 		election.stage = 1;
 		displayElectionFull(election);
 	}).catch((err) => {
+		displayError('An error occured during the shuffle of the election. The election may have already been shuffled once.');
 		console.log(err);
 	});
 }
@@ -146,9 +156,11 @@ function finalize(election){
 * @throw TypeError if the id field of election is not valid.
 */
 function decryptBallots(election){
+	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
 	}
+	/* End type check. */
 
 	var decryptBallotsMessage = {
 		token: sessionToken,
@@ -158,6 +170,7 @@ function decryptBallots(election){
 		$("#div2").append(paragraph("Decrypted ballots : "));
 		displayDecryptedBox(data.decrypted.ballots);
 	}).catch((err) => {
+		displayError('An error occured during the decryption of the ballots, the election may have already been decrypted once.');
 		console.log(err);
 	});
 }
@@ -173,6 +186,7 @@ function decryptBallots(election){
 * @throw RangeError if the stage field of election is not in the range [0, 2]. 
 */
 function decryptAndDisplayElectionResult(election){
+	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
 	}
@@ -182,9 +196,10 @@ function decryptAndDisplayElectionResult(election){
 	if(election.stage < 0 || election.stage > 2){
 		throw new RangeError('The stage of the election should be in the range [0, 2].');
 	}
+	/* End type check. */
 
 	if(election.stage < 2){
-
+		/* The election is not decrypted yet. */
 		var decryptBallotsMessage = {
 			token: sessionToken,
 			genesis: election.id
@@ -193,10 +208,12 @@ function decryptAndDisplayElectionResult(election){
 			election.stage = 2;
 			displayElectionResult(election, data.decrypted.ballots);
 		}).catch((err) => {
+			displayError('An error occured during the decryption of the election. It may have already been decrypted once.');
 			console.log(err);
 		});
 
 	}else{
+		/* The election have already been decrypted once. */
 		var aggregateDecryptedMessage = {
 			token : sessionToken,
 			genesis : election.id,
@@ -205,6 +222,7 @@ function decryptAndDisplayElectionResult(election){
 		socket.send('Aggregate', 'AggregateReply', aggregateDecryptedMessage).then((data) => {
 			displayElectionResult(election, data.box.ballots);
 		}).catch((err) => {
+			displayError('An error occured during the aggregation of the decrypted ballots.');
 			console.log(err);
 		});
 	}
@@ -219,9 +237,11 @@ function decryptAndDisplayElectionResult(election){
 * @throw TypeError if the id field of election is not valid.
 */
 function aggregateBallot(election){
+	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
 	}
+	/* End type check. */
 
 	var aggregateBallotMessage = {
 		token : sessionToken,
@@ -232,6 +252,7 @@ function aggregateBallot(election){
 		$("#div2").append(paragraph("Original ballots : "));
 		displayBallotBox(data.box.ballots);
 	}).catch((err) => {
+		displayError('An error occured during the aggregation of the ballots.');
 		console.log(err);
 	});
 }
@@ -245,9 +266,11 @@ function aggregateBallot(election){
 * @throw TypeError if the id field of election is not valid.
 */
 function aggregateShuffle(election){
+	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
 	}
+	/* End type check. */
 
 	var aggregateShuffleMessage = {
 		token : sessionToken,
@@ -258,6 +281,7 @@ function aggregateShuffle(election){
 		$("#div2").append(paragraph("Shuffled ballots : "));
 		displayShuffledBox(data.box.ballots);
 	}).catch((err) => {
+		displayError('An error occured during the aggregation of the ballots.');
 		console.log(err);
 	});
 }
@@ -275,9 +299,11 @@ function aggregateShuffle(election){
 * @throw TypeError if one of the election's deadline is invalid.
 */
 function compareByDate(election1, election2){
+	/* Type check. */
 	if(typeof election1.end != 'string' || typeof election2.end != 'string'){
 		throw new TypeError('One of the election\'s end field isn\'t a string.');
 	}
+	/* End type check. */
 
 	return createDateFromString(election1.end) < createDateFromString(election2.end);
 }

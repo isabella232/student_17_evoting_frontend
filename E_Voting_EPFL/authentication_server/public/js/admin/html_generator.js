@@ -4,7 +4,7 @@
 */
 
 
-//Some colors constants for the buttons.
+/* Some colors constants for the buttons. */
 const red = "#ff0707";
 const green = "#30f209";
 const grey = "#b2a0a0";
@@ -138,6 +138,25 @@ function createDateFromString(string){
 	}else{
 		return null;
 	}
+}
+
+
+/**
+* Displays an error message on the screen to alert the user of the problem.
+*
+* @param String message : the error message to display.
+*
+* @throw TypeError if the given message is not a string.
+*/
+function displayError(message){
+	/* Type check. */
+	if(typeof message != 'string'){
+		throw new TypeError('The error message should be a string.');
+	}
+	/* End type check. */
+
+	$('#errDiv').empty();
+	$('#errDiv').append(paragraph(message));
 }
 
 

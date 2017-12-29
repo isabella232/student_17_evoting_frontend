@@ -13,6 +13,7 @@
 * @throw TypeError if one of the election's creator field is invalid.
 */
 function displayElections(elections){
+	/* Type check. */
 	if(typeof elections != 'object' || typeof elections.length != 'number'){
 		throw new TypeError('The given election array is invalid.');
 	}
@@ -21,19 +22,27 @@ function displayElections(elections){
 			throw new TypeError('At least one of the election\'s creator is not well defined.');
 		} 
 	}
+	/* End type check. */
 
     	clearDisplay();
 
-    	if(elections.length > 0){
+	var createdElections = [];
+	for(var i = 0; i < elections.length; i++){
+		if(elections[i].creator == userSciper){
+			createdElections[createdElections.length] = elections[i];
+		}
+	}
+
+    	if(createdElections.length > 0){
+		/* The admin already created an election. */
 		$("#div1").append(h2("Your elections :"));
 		$("#div1").append(separationLine());
-		for(var i = 0; i < elections.length; i++){
-			if(elections[i].creator == userSciper){
-				$("#div1").append("    ");
-				displayElectionListItem(elections[i]);
-			}
+		for(var i = 0; i < createdElections.length; i++){
+			$("#div1").append("    ");
+			displayElectionListItem(elections[i]);
 		}
 	}else{
+		/* The admin didn't create any election yet? */
 		$("#div1").append(paragraph("You didn't create any elections yet."));
 	}
 }
@@ -48,31 +57,34 @@ function displayElections(elections){
 * @throw RangeError if the stage of the election is not in the range [0, 2].
 */
 function displayElectionListItem(election){
+	/* Type check. */
 	if(typeof election.stage != 'number'){
 		throw new TypeError('The stage of the election is invalid.');
 	}
 	if(election.stage < 0 || election.stage > 2){
 		throw new RangeError('The stage of the election should be in the range [0, 2].');
 	}
+	/* End type check. */
 
     	$("#div1").append(clickableElement('h3', ''+election.name, function(){
 		displayElectionFull(election);
 	    }, "list_item"));
 
 	if(createDateFromString(election.end) > new Date()){
-		//Display end date when the election is not finished.
+		/* Display end date when the election is not finished. */
 		$("#div1").append(h4("End date : "+election.end));
 	}else if(election.stage == 0){
-		//Clearly state that the election is finished (unshuffled case).
+		/* Clearly state that the election is finished (unshuffled case). */
 		var element = h4("Finished");
 		element.style.color = "#FF0000";
 		$("#div1").append(element);
 	}else if(election.stage == 1){
-		//Clearly state that the election is finished and shuffled.
+		/* Clearly state that the election is finished and shuffled. */
 		var element = h4("Finished - Shuffled");
 		element.style.color = "#FF0000";
 		$("#div1").append(element);
 	}else{
+		/* Clearly state that the election is finished and shuffled. */
 		var element = h4("Finished - Decrypted");
 		element.style.color = "#FF0000";
 		$("#div1").append(element);	
@@ -90,6 +102,7 @@ function displayElectionListItem(election){
 * @throw TypeError if the users of the election is not an array of numbers.
 */
 function displayElectionFull(election){
+	/* Type check. */
 	if(typeof election.name != 'string'){
 		throw new TypeError('The given election has an invalid name field.');
 	}
@@ -101,16 +114,15 @@ function displayElectionFull(election){
 			throw new TypeError('At least one user of the election has a wrong format.');
 		}
 	}
+	/* End type check. */
 
 	clearDisplay();	
 
 	$("#div1").append(createCenteredDiv("details"));
 
 	$("#details").append("<h2>"+election.name+"</h2>");
-
-	if(election.creator != null){
-		$("#details").append(paragraph("Created by  : "+election.creator));
-	}
+	
+	$("#details").append(paragraph("Created by  : "+election.creator));
 
 	if(election.end != null){
 		$("#details").append(paragraph("Deadline    : "+election.end));
@@ -140,14 +152,14 @@ function displayElectionFull(election){
 	$("#details").append(paragraph("Voters : "+usersString));
 
 	if(createDateFromString(election.end) >= new Date()){
-		//End date not reached yet
+		/* End date not reached yet. */
 		displayVotingButtonSet();
 	}else{
-		//End date reached
+		/* End date reached. */
 		if(election.stage == 0){
-			displayFinalizeButtonSet(election);		
+			displayFinalizeButtonSet(election);	// Election not shuffled.	
 		}else{
-			displayAggregateButtonSet(election);
+			displayAggregateButtonSet(election);	// Election shuffled.
 		}
 	}
 }
@@ -164,6 +176,7 @@ function displayElectionFull(election){
 * @throw RangeError if the length of the array is not divisible by 3.
 */
 function uint8ArrayToScipers(array){
+	/* Type check. */
 	if(typeof array != 'object' || typeof array.length != 'number'){
 		throw new TypeError('The given array is not valid.');
 	}
@@ -175,6 +188,7 @@ function uint8ArrayToScipers(array){
 	if(array.length % 3 != 0){
 		throw new RangeError('The length of the array is not divisible by 3.');
 	}
+	/* End type check. */
 
 	var recovered = [];
 	for(var i = 0; 3*i < array.length; i ++){
@@ -203,7 +217,7 @@ function displayVotingButtonSet(){
 function displayFinalizeButtonSet(election){
 	$("#details").append(unclickableButton("Voting", red));
 	$("#details").append(clickableButton("Shuffle", green, function(){
-		finalize(election);
+			finalize(election);
 		}));
 	$("#details").append(unclickableButton("Aggregate", grey));
 	$("#details").append(paragraph("The election is now over, you can now finalize and shuffle the election."));
@@ -235,18 +249,18 @@ function displayChooseAggregate(election){
 	$("#select").append(paragraph("Show one of the following steps :"));
 	$("#select").append(clickableElement("button", "Voting", function(){
 		$("#div2").empty();
-		displayChooseAggregate(election);
-		aggregateBallot(election);
+			displayChooseAggregate(election);
+			aggregateBallot(election);
 		}));
 	$("#select").append(clickableElement("button", "Shuffle", function(){
 		$("#div2").empty();
-		displayChooseAggregate(election);
-		aggregateShuffle(election);
+			displayChooseAggregate(election);
+			aggregateShuffle(election);
 		}));
 	$("#select").append(clickableElement("button", "Result", function(){
 		$("#div2").empty();
-		displayChooseAggregate(election);
-		decryptAndDisplayElectionResult(election);
+			displayChooseAggregate(election);
+			decryptAndDisplayElectionResult(election);
 		}));
 }
 
@@ -262,6 +276,7 @@ function displayChooseAggregate(election){
 * @throw TypeError if one of the element of ballots has an invalid text field.
 */
 function displayElectionResult(election, ballots){
+	/* Type check. */
 	if(typeof election.users != 'object' || typeof election.users.length != 'number'){
 		throw new TypeError('The users field of the election is invalid.');
 	}
@@ -273,9 +288,11 @@ function displayElectionResult(election, ballots){
 			throw new TypeError('At least one of the ballots\' text field is invalid.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("Election result : "));
 	
+	/* Compute results from given ballots. */
 	var pairArray = [];
 	for(var i = 0; i < election.users.length; i++){
 		pairArray[i] = {key: election.users[i], value: 0};
@@ -319,9 +336,11 @@ function displayElectionResult(election, ballots){
 * @throw TypeError if the value field of one of the pair is not a number.
 */
 function comparePairs(pair1, pair2){
+	/* Type check. */
 	if(typeof pair1.value != 'number' || typeof pair2.value != 'number'){
 		throw new TypeError('At least one the pairs\' value field is not a number.');
 	}
+	/* End type check. */
 
 	return pair1.value < pair2.value;
 }
@@ -337,6 +356,7 @@ function comparePairs(pair1, pair2){
 * @throw TypeError if the box is not an array of ballots.
 */
 function displayBallotBox(box){
+	/* Type check. */
 	if(typeof box != 'object' || typeof box.length != 'number'){
 		throw new TypeError('The given box is not an array.');
 	}
@@ -345,6 +365,7 @@ function displayBallotBox(box){
 			throw new TypeError('At least one of the ballots in the box is invalid.');
 		}
 	}
+	/* End type check. */
 
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){
@@ -372,6 +393,7 @@ function displayBallotBox(box){
 * @throw TypeError if the box is not an array of ballots. 
 */
 function displayShuffledBox(box){
+	/* Type check. */
 	if(typeof box != 'object' || typeof box.length != 'number'){
 		throw new TypeError('The given box is not an array.');
 	}
@@ -380,6 +402,7 @@ function displayShuffledBox(box){
 			throw new TypeError('At least one of the ballots in the box is invalid.');
 		}
 	}
+	/* End type check. */
 
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){

@@ -26,6 +26,7 @@ function displayElectionCreation(){
 	$("#details").append("</form>");
 
 	$("#details").append(clickableElement("button", "Finish", function(){
+		/* Verify the validity of the information entered by the user, display an error if necessary. */
 		var errors = false;
 		$("#errDiv").empty();
 
@@ -80,6 +81,7 @@ function displayElectionCreation(){
 		}		
 
 		if(!errors){
+			/* The informations are all valid, go to confirmation screen. */
 			electionConfirmation(name, deadline, description, participants, voters);
 		}
 	}));
@@ -99,6 +101,7 @@ function displayElectionCreation(){
 * @throw TypeError if voters is not an array of numbers.
 */
 function electionConfirmation(name, deadline, description, participants, voters){
+	/* Type check. */
 	if(typeof participants != 'object' || typeof participants.length != 'number'){
 		throw new TypeError('The given participants array is invalid.');
 	}
@@ -116,6 +119,7 @@ function electionConfirmation(name, deadline, description, participants, voters)
 			throw new TypeError('At least one of the voters is not a number.');
 		}
 	}	
+	/* End type check. */
 
 	clearDisplay();
 	$("#div1").append(createCenteredDiv("details"));
@@ -141,11 +145,11 @@ function electionConfirmation(name, deadline, description, participants, voters)
 	$("#details").append(paragraph(""));
 
 	$("#details").append(clickableElement("button", "Create", function(){
-		createElection(name, deadline, description, participants, voters);
+			createElection(name, deadline, description, participants, voters);
 		}));
 	$("#details").append(clickableElement("button", "Modify", function(){
-		displayElectionCreation();
-		injectElectionDetails(name, deadline, description, participants, voters);
+			displayElectionCreation();
+			injectElectionDetails(name, deadline, description, participants, voters);
 		}));
 }
 
@@ -163,6 +167,7 @@ function electionConfirmation(name, deadline, description, participants, voters)
 * @throw TypeError if voters is not an array of numbers.
 */
 function injectElectionDetails(name, deadline, description, participants, voters){
+	/* Type check. */
 	if(typeof participants != 'object' || typeof participants.length != 'number'){
 		throw new TypeError('The given participants array is invalid.');
 	}
@@ -180,6 +185,7 @@ function injectElectionDetails(name, deadline, description, participants, voters
 			throw new TypeError('At least one of the voters is not a number.');
 		}
 	}
+	/* End type check. */
 
 	$("input[type='text'][name='name']").val(name);
 	$("input[type='text'][name='deadline']").val(deadline);

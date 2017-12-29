@@ -75,9 +75,11 @@ function logout(){
 * @throw TypeError if the sciper is not a string.
 */
 function mockAuthentication(sciper){
+	/* Type check. */
 	if(typeof sciper != 'string'){
 		throw new TypeError('The sciper should be a string');
 	}
+	/* End type check. */
 
 	userSciper = sciper;
         

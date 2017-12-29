@@ -14,7 +14,7 @@ var sessionToken;
 * Send a Login message to the cothority, asking for available elections.
 *
 * @param String sciper : the sciper of the user.
-* @param Uint8Array signature : the signature of the authentication server.
+* @param Byte[] signature : the signature of the authentication server.
 */
 function sendLoginRequest(sciper, signature){
 
@@ -31,6 +31,7 @@ function sendLoginRequest(sciper, signature){
 		recoveredElections = recoveredElections.sort(compareByDate); //Sort election by deadlines.
 		displayElections(recoveredElections);
 	}).catch((err) => {
+		displayError('An error occured during the login, please try again later.');
 		console.log(err);
 	});
     
@@ -38,7 +39,7 @@ function sendLoginRequest(sciper, signature){
 
 
 /**
-* Send a Cast message to the election. An encrypted ballot is sended with the given choice in it.
+* Send a Cast message to the election. An encrypted ballot is sent with the given choice in it.
 *
 * @param Election election : the elections we want to vote in.
 * @param Number choice : the choice of the user in the election.
@@ -49,6 +50,7 @@ function sendLoginRequest(sciper, signature){
 * @throw RangeError if the choice is not a 6 or 7 digits.
 */
 function submitVote(election, choice){
+	/* Type check. */
 	if(typeof choice != 'number'){
 		throw new TypeError('The choice should be a number.');
 	}
@@ -61,6 +63,7 @@ function submitVote(election, choice){
 	if(typeof election.id != 'string'){
 		throw new TypeError('The given election has an invalid id field.');
 	}
+	/* End type check. */
   	
 	var tmp = choice;
 	var n0 = tmp & 0xFF;
@@ -74,6 +77,7 @@ function submitVote(election, choice){
 
 	var point = dedis.crypto.unmarshal(election.key);
 
+	/* Encrypt ballot. */
 	var encryptedMessage = dedis.crypto.elgamalEncrypt(point, messageToEncrypt);
 	var alpha = dedis.crypto.marshal(encryptedMessage.Alpha);
 	var beta = dedis.crypto.marshal(encryptedMessage.Beta);
@@ -93,6 +97,7 @@ function submitVote(election, choice){
 	socket.send('Cast', 'CastReply', castMessage).then((data) => {
 		displayElections(recoveredElections);
 	}).catch((err) => {
+		displayError('An error occured during the submission of the ballot.');
 		console.log(err);	
 	});
 }
@@ -108,6 +113,7 @@ function submitVote(election, choice){
 * @throw RangeError if hte stage field of the election is not in the range [0, 2].
 */
 function decryptAndDisplayElectionResult(election){
+	/* Type check. */
 	if(typeof election.stage != 'number'){
 		throw new TypeError('The given election has an invalid stage field.');
 	}
@@ -117,8 +123,10 @@ function decryptAndDisplayElectionResult(election){
 	if(typeof election.id != 'string'){
 		throw new TypeError('The given election has an invalid id field.');
 	}
+	/* End type check. */
 
 	if(election.stage < 2){
+		/* Election not decrypted yet. */		
 
 		var decryptBallotsMessage = {
 			token: sessionToken,
@@ -128,10 +136,13 @@ function decryptAndDisplayElectionResult(election){
 			election.stage = 2;
 			displayElectionResult(election, data.decrypted.ballots);
 		}).catch((err) => {
+			displayError('An error occured during the decryption of the election.');
 			console.log(err);
 		});
 
 	}else{
+		/* Election already decrypted. */
+
 		var aggregateDecryptedMessage = {
 			token : sessionToken,
 			genesis : election.id,
@@ -140,6 +151,7 @@ function decryptAndDisplayElectionResult(election){
 		socket.send('Aggregate', 'AggregateReply', aggregateDecryptedMessage).then((data) => {
 			displayElectionResult(election, data.box.ballots);
 		}).catch((err) => {
+			displayError('An error occured during the aggregation of the ballots.');
 			console.log(err);
 		});
 	}
@@ -158,9 +170,11 @@ function decryptAndDisplayElectionResult(election){
 * @throws TypeError if either of the two deadlines of the elections is not a string.
 */
 function compareByDate(election1, election2){
+	/* Type check. */
 	if(typeof election1.end != 'string' || typeof election2.end != 'string'){
 		throw new TypeError('The deadline of an election should be a string.');
 	}
+	/* End type check. */
 
 	return createDateFromString(election1.end) < createDateFromString(election2.end);
 }

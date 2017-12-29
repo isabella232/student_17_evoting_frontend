@@ -22,6 +22,7 @@ var id = 0;
 * @throw TypeError if at least one of the ballots does not respect the desired format.
 */
 function generateResultGrid(results){
+	/* Type check. */
 	if(typeof results != 'object' || typeof results.length != 'number'){
 		throw new TypeError('The given results is not an array.');
 	}
@@ -31,6 +32,7 @@ function generateResultGrid(results){
 			throw new TypeError('At least one of the ballots does not respect the desired format.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 
@@ -70,6 +72,7 @@ function generateResultGrid(results){
 * @throw TypeError if one of the ballots does not respect the desired format.
 */
 function generateEncryptedBallotsGrid(ballots){
+	/* Type check. */
 	if(typeof ballots != 'object' || typeof ballots.length != 'number'){
 		throw new TypeError('The given ballots is not an array.');
 	}
@@ -79,6 +82,7 @@ function generateEncryptedBallotsGrid(ballots){
 			throw new TypeError('At least one of the ballots does not respect the desired format.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 

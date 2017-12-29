@@ -14,7 +14,7 @@ function showBanner(){
 
 
 /**
-* Inject the navigation bar for a disconnected user.
+* Inject an empty navigation bar for a disconnected user.
 */
 function showNavDisconnected(){
 	clearNavigation();
@@ -27,10 +27,10 @@ function showNavDisconnected(){
 function showNavConnected(){
 	clearNavigation();
 	$("#nav_election_list").append(clickableElement("p", "Your elections", function(){
-		displayElections(recoveredElections);
+			displayElections(recoveredElections);
 		}));
 	$("#logout").append(clickableElement("p", "Logout", function(){
-		logout();
+			logout();
 		}));
 	$("#user_infos").append(paragraph("Hi "+userSciper));
 }
@@ -46,19 +46,20 @@ function displayWelcomePage(){
 	$("#div1").append(paragraph("while ensuring you security and authenticity.")); 
 	$("#div1").append(paragraph("To see the elections available, please login."));
 	$("#div1").append("<form>");
+	/* Enter sciper to mock the authentication. Have to be removed in later version of the application. */
 	$("#div1").append(paragraph("Sciper :"));
 	$("#div1").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
 	$("#div1").append("</form>");
 	$("#div1").append(clickableElement("button", "Login", function(){
-		//authenticate();
-		/* Mocking authentication waiting to turn into HTTPS. */
-		var sciper = $("input[type='text'][name='sciper']").val();
-		if(verifyValidSciper(sciper)){
-			mockAuthentication(sciper);
-			showNavConnected();
-		}else{
-			$("#errDiv").append(paragraph("Incorrect SCIPER, please enter a valid one."));
-		}
+			//authenticate();
+			/* Mocking authentication waiting to turn into HTTPS. */
+			var sciper = $("input[type='text'][name='sciper']").val();
+			if(verifyValidSciper(sciper)){
+				mockAuthentication(sciper);
+				showNavConnected();
+			}else{
+				$("#errDiv").append(paragraph("Incorrect SCIPER, please enter a valid one."));
+			}
 		}));
 }
 
@@ -74,6 +75,7 @@ function displayWelcomePage(){
 * @throw RangeError if the stage field of the election is not in the range [0, 2].
 */
 function displayElectionListItem(election){
+	/* Type check. */
 	if(typeof election.name != 'string'){
 		throw new TypeError('The name of the election should be a string.');
 	}
@@ -86,6 +88,7 @@ function displayElectionListItem(election){
 	if(election.stage < 0 || election.stage > 2){
 		throw new RangeError('The stage of the election is not in the good range.');
 	}
+	/* End type check. */
 
     	$("#div1").append(clickableElement('h3', ''+election.name, function(){
 		displayElectionFull(election);
@@ -104,6 +107,7 @@ function displayElectionListItem(election){
 		element.style.color = "#FF0000";
 		$("#div1").append(element);
 	}else{
+		/* Clearly state that the election is finished and decrypted. */
 		var element = h4("Finished - Decrypted");
 		element.style.color = "#FF0000";
 		$("#div1").append(element);
@@ -123,6 +127,7 @@ function displayElectionListItem(election){
 * @throw RangeError if the stage field of the election is not in the range [0, 2].
 */
 function displayElectionFull(election){
+	/* Type check. */
 	if(typeof election.name != 'string'){
 		throw new TypeError('The name of the election should be a string.');
 	}
@@ -135,17 +140,14 @@ function displayElectionFull(election){
 	if(election.stage < 0 || election.stage > 2){
 		throw new RangeError('The stage of the election is not in the good range.');
 	}
-	
+	/* End type check. */
 
 	clearDisplay();	
 
 	$("#div1").append(createDiv("details"));
 
 	$("#details").append("<h2>"+election.name+"</h2>");
-
-	if(election.creator != null){
-		$("#details").append(paragraph("Created by  : "+election.creator));
-	}
+	$("#details").append(paragraph("Created by  : "+election.creator));
 
 	if(election.end != null){
 		$("#details").append(paragraph("Deadline    : "+election.end));
@@ -156,7 +158,7 @@ function displayElectionFull(election){
 	}
 
 	if(createDateFromString(election.end) >= new Date()){
-		/* Election not finished yet */
+		/* Election not finished yet, the user can still vote. */
 
 		$("#details").append("<form>");
 
@@ -169,10 +171,11 @@ function displayElectionFull(election){
 		$("#details").append("</form>");
 	
 	    	$("#details").append(clickableElement('button', 'Submit', function(){
-			var selectedSciper = Number($("input[type='radio'][name='choice']:checked").val());
-			submitVote(election, selectedSciper);
+				var selectedSciper = Number($("input[type='radio'][name='choice']:checked").val());
+				submitVote(election, selectedSciper);
 			}));
 	}else{
+		/* Election finished, the user can't vote anymore. */
 		$("#details").append(h3("The vote for this election is over."));
 		if(election.stage < 2){
 			$("#details").append(h3("Please wait for the administrator of the election to finalize it."));
@@ -187,18 +190,20 @@ function displayElectionFull(election){
 /**
 * Turns a uint8Array into a uint32Array representing the scipers.
 * 
-* @param Object[] array the array to convert into scipers.
+* @param Byte[] array the array to convert into scipers.
 *
 * @throw new TypeError if array is not valid.
 * @throw new RangeError if the length of the array is not divisible by 3.
 */
 function uint8ArrayToScipers(array){
+	/* Type check. */
 	if(typeof array != 'object' || typeof array.length != 'number'){
 		throw new TypeError('The type of the array is not valid.');
 	}
 	if(array.length % 3 != 0){
 		throw new RangeError('The array given has not a length divisible by 3 and can\'t be valid.');
 	}
+	/* End type check. */
 
 	var recovered = [];
 	for(var i = 0; 3*i < array.length; i ++){
@@ -219,6 +224,7 @@ function uint8ArrayToScipers(array){
 * @throw TypeError if at least one of the instances of ballots is invalid.
 */
 function displayElectionResult(election, ballots){
+	/* Type check. */
 	if(typeof election.users != 'object'){
 		throw new TypeError('The users field of the election is invalid.');
 	}
@@ -230,9 +236,11 @@ function displayElectionResult(election, ballots){
 			throw new TypeError('At least one of the ballots is invalid.');
 		}
 	}
+	/* End type check. */
 
 	$("#div2").append(paragraph("Election result : "));
 	
+	/* Computes the results from the given ballots. */
 	var pairArray = [];
 	for(var i = 0; i < election.users.length; i++){
 		pairArray[i] = {key: election.users[i], value: 0};
@@ -253,6 +261,7 @@ function displayElectionResult(election, ballots){
 		pairArray[index] = {key: plain, value: tmp + 1};
 	}
 
+	/* Sort the results in ascending order. */
 	pairArray.sort(comparePairs);
 
 	var displayedArray = [];
@@ -268,16 +277,18 @@ function displayElectionResult(election, ballots){
 /**
 * compares a key / value pair by comparing their values.
 *
-* @param Object pair1 the first pair to compare.
-* @param Object pair2 the second pair to compare.
+* @param Object pair1 the first key / value pair to compare.
+* @param Object pair2 the second key / value pair to compare.
 * The pairs should be objects with a key field and a value field.
 *
 * @throw TypeError if the value field of one of the pairs is invalid.
 */
 function comparePairs(pair1, pair2){
+	/* Type check. */
 	if(typeof pair1.value != 'number' || typeof pair2.value != 'number'){
 		throw new TypeError('At least one of the pairs has an invalid value field.');
 	}
+	/* End type check. */
 
 	return pair1.value < pair2.value;
 }
@@ -291,13 +302,16 @@ function comparePairs(pair1, pair2){
 * @throw TypeError if the array of elections is invalid.
 */
 function displayElections(elections){
+	/* Type check. */
 	if(typeof elections != 'object' || typeof elections.length != 'number'){
 		throw new TypeError('The array of elections is invalid.');
 	}
+	/* End type check. */
 
     	clearDisplay();
 
     	if(elections.length > 0){
+		/* There is some elections to display. */
 		$("#div1").append(h2("Available elections :"));
 		$("#div1").append(separationLine());
 		for(var i = 0; i < elections.length; i++){
@@ -307,13 +321,15 @@ function displayElections(elections){
 		$("#div1").append(paragraph("Note that you can vote several times for the same election,"));
 		$("#div1").append(paragraph("However, only the last vote will be taken into account."));
 	}else{
+		/* No elections to display. */
 		$("#div1").append(paragraph("No elections to show"));
 	}
 }
 
 
 /**
-* Verify if a given string representing a SCIPER number is in the good format (ABCDEF) of (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
+* Verify if a given string representing a SCIPER number is in the good format 
+* (ABCDEF) of (ABCDEFG) where A,B,C,D,E,F,G are in [0 - 9].
 *
 * @param String sciper : the string to verify.
 *
@@ -354,6 +370,25 @@ function createDateFromString(string){
 	}else{
 		return null;
 	}
+}
+
+
+/**
+* Displays an error message on the screen to alert the user of the problem.
+*
+* @param String message : the error message to display.
+*
+* @throw TypeError if the given message is not a string.
+*/
+function displayError(message){
+	/* Type check. */
+	if(typeof message != 'string'){
+		throw new TypeError('The error message should be a string.');
+	}
+	/* End type check. */
+
+	$('#errDiv').empty();
+	$('#errDiv').append(paragraph(message));
 }
 
 

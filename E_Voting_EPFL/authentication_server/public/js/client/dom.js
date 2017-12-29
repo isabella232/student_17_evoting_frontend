@@ -1,6 +1,6 @@
 /**
 * DOM generator.
-* Allows to generate elements with associated functions.
+* Allows to generate elements to inject in the document through jQuery.
 */
 
 
@@ -10,7 +10,7 @@
 * @param String elementType : the type of the element to create.
 * @param String textToDisplay : the text to display on the element.
 * @param Function onClick : the function to execute when clicking on the created element.
-* @param String className : name of class to add to the element.
+* @param (Optional) String className : name of class to add to the element.
 *
 * @return HTMLElement : an element with the given attributes.
 *
@@ -19,6 +19,7 @@
 * @throw TypeError if onClick is not a function.
 */
 function clickableElement(elementType, textToDisplay, onClick, className){
+	/* Type check. */
 	if(typeof elementType != 'string'){
 		throw new TypeError('The element type should be given as a string.');
 	}
@@ -28,11 +29,14 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 	if(typeof onClick != 'function'){
 		throw new TypeError('The on click method should be a function.');
 	}
+	/* End type check. */
 
 	var element = document.createElement(elementType);
 	element.innerHTML = textToDisplay;
 	element.addEventListener("click", onClick);
 	element.style.cursor = "pointer";
+
+	/* If a class has been asked to be added, add it. Otherwise do nothing more. */
 	if(typeof className != "undefined"){
 		element.className += className;
 	}
@@ -50,9 +54,11 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 * @throw TypeError if id is not a string.
 */
 function createDiv(id){
+	/* Type check. */
 	if(typeof id != 'string'){
 		throw new TypeError('The id of the new div should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("div");
 	element.id = id;
@@ -73,9 +79,11 @@ function createDiv(id){
 * @throw TypeError if id is not a String.
 */
 function createGrid(id){
+	/* Type check. */
 	if(typeof id != 'string'){
 		throw new TypeError('The id of new div for the grid should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("div");
 	element.id = id;
@@ -96,9 +104,11 @@ function createGrid(id){
 * @throw TypeError if textToDisplay is not a string.
 */
 function paragraph(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("p");
 	element.innerHTML = textToDisplay;
@@ -116,9 +126,11 @@ function paragraph(textToDisplay) {
 * @throw TypeError if textToDisplay is not a string.
 */
 function h2(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
+	/* End type check. */
 	
 	var element = document.createElement("h2");
 	element.innerHTML = textToDisplay;
@@ -136,9 +148,11 @@ function h2(textToDisplay) {
 * @throw TypeError if textToDisplay is not a string.
 */
 function h3(textToDisplay) {
+	/* Type check.*/
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("h3");
 	element.innerHTML = textToDisplay;
@@ -156,9 +170,11 @@ function h3(textToDisplay) {
 * @throw TypeError if textToDisplay is not a string.
 */
 function h4(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("h4");
 	element.innerHTML = textToDisplay;

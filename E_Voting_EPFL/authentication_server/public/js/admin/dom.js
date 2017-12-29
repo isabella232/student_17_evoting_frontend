@@ -19,6 +19,7 @@
 * @throw TypeError if onClick is not a function.
 */
 function clickableElement(elementType, textToDisplay, onClick, className){
+	/* Type check. */
 	if(typeof elementType != 'string'){
 		throw new TypeError('The element type should be given as a string.');
 	}
@@ -28,6 +29,7 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 	if(typeof onClick != 'function'){
 		throw new TypeError('The on click method should be a function.');
 	}
+	/* End type check. */
 
 	var element = document.createElement(elementType);
 	element.innerHTML = textToDisplay;
@@ -54,6 +56,7 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 * @throw TypeError if onClick is not a function.
 */
 function clickableButton(textToDisplay, color, onClick){
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
@@ -63,6 +66,7 @@ function clickableButton(textToDisplay, color, onClick){
 	if(typeof onClick != 'function'){
 		throw new TypeError('The on click function given is not a function.');
 	}
+	/* End type check. */
 
 	var element = clickableElement("button", textToDisplay, onClick);
 	element.style.backgroundColor = color;
@@ -84,12 +88,14 @@ function clickableButton(textToDisplay, color, onClick){
 * @throw TypeError if color is not a string.
 */
 function unclickableButton(textToDisplay, color){
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The text to display should be a string.');
 	}
 	if(typeof color != 'string'){
 		throw new TypeError('The color of the element should be given as an hexadecimal string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("button");
 	element.innerHTML = textToDisplay;
@@ -111,9 +117,11 @@ function unclickableButton(textToDisplay, color){
 * @throw TypeError if id is not a string.
 */
 function createCenteredDiv(id){
+	/* Type check. */
 	if(typeof id != 'string'){
 		throw new TypeError('The given id should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("div");
 	element.id = id;
@@ -134,9 +142,11 @@ function createCenteredDiv(id){
 * @throw TypeError if id is not a string.
 */
 function createGrid(id){
+	/* Type check. */
 	if(typeof id != 'string'){
 		throw new TypeError('The given id should be a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("div");
 	element.id = id;
@@ -157,9 +167,11 @@ function createGrid(id){
 * @throw TypeError if the text to display is not a string.
 */
 function paragraph(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The given text to display is not a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("p");
 	element.innerHTML = textToDisplay;
@@ -177,9 +189,11 @@ function paragraph(textToDisplay) {
 * @throw TypeError if the text to display is not a string.
 */
 function h2(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The given text to display is not a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("h2");
 	element.innerHTML = textToDisplay;
@@ -197,9 +211,11 @@ function h2(textToDisplay) {
 * @throw TypeError if the text to display is not a string.
 */
 function h3(textToDisplay) {
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The given text to display is not a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("h3");
 	element.innerHTML = textToDisplay;
@@ -216,10 +232,12 @@ function h3(textToDisplay) {
 *
 * @throw TypeError if the text to display is not a string.
 */
-function h4(textToDisplay) {
+function h4(textToDisplay) {	
+	/* Type check. */
 	if(typeof textToDisplay != 'string'){
 		throw new TypeError('The given text to display is not a string.');
 	}
+	/* End type check. */
 
 	var element = document.createElement("h4");
 	element.innerHTML = textToDisplay;

@@ -65,9 +65,9 @@ function logout(){
 
 
 /**
-* Mock the authentication for the given SCIPER.
+* Mock the authentication for the given sciper.
 *
-* @param sciper : the sciper to mock the authentication.
+* @param Number sciper : the sciper to mock the authentication.
 */
 function mockAuthentication(sciper){
 	userSciper = sciper;
