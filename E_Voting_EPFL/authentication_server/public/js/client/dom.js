@@ -12,9 +12,23 @@
 * @param Function onClick : the function to execute when clicking on the created element.
 * @param String className : name of class to add to the element.
 *
-* @return HTML Element : an element with the given attributes.
+* @return HTMLElement : an element with the given attributes.
+*
+* @throw TypeError if elementType is not a String.
+* @throw TypeError if textToDisplay is not a String.
+* @throw TypeError if onClick is not a function.
 */
 function clickableElement(elementType, textToDisplay, onClick, className){
+	if(typeof elementType != 'string'){
+		throw new TypeError('The element type should be given as a string.');
+	}
+	if(typeof textToDisplay != 'string'){
+		throw new TypeError('The text to display should be given as a string.');
+	}
+	if(typeof onClick != 'function'){
+		throw new TypeError('The on click method should be a function.');
+	}
+
 	var element = document.createElement(elementType);
 	element.innerHTML = textToDisplay;
 	element.addEventListener("click", onClick);
@@ -31,9 +45,15 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 *
 * @param id : the id of the new division.
 *
-* @return HTML Element : a division with the given id.
+* @return HTMLElement : a division with the given id.
+*
+* @throw TypeError if id is not a string.
 */
 function createDiv(id){
+	if(typeof id != 'string'){
+		throw new TypeError('The id of the new div should be a string.');
+	}
+
 	var element = document.createElement("div");
 	element.id = id;
 	element.style.textAlign = "left";
@@ -48,9 +68,15 @@ function createDiv(id){
 *
 * @param id : the id of the new division.
 *
-* @return HTML Element : a division with the given id.
+* @return HTMLElement : a division with the given id.
+*
+* @throw TypeError if id is not a String.
 */
 function createGrid(id){
+	if(typeof id != 'string'){
+		throw new TypeError('The id of new div for the grid should be a string.');
+	}
+
 	var element = document.createElement("div");
 	element.id = id;
 	element.style.width = "80%";
@@ -66,11 +92,17 @@ function createGrid(id){
 * @param String textToDisplay : the text to display in the paragraph.
 *
 * @return HTMLParagraphElement an element representing a paragraph with the given text.
+*
+* @throw TypeError if textToDisplay is not a string.
 */
 function paragraph(textToDisplay) {
-    var element = document.createElement("p");
-    element.innerHTML = textToDisplay;
-    return element;
+	if(typeof textToDisplay != 'string'){
+		throw new TypeError('The text to display should be a string.');
+	}
+
+	var element = document.createElement("p");
+	element.innerHTML = textToDisplay;
+	return element;
 }
 
 
@@ -80,11 +112,17 @@ function paragraph(textToDisplay) {
 * @param String textToDisplay : the text to insert in the header.
 *
 * @return HTMLH2Element an element representing a header h2 element with the given text.
+*
+* @throw TypeError if textToDisplay is not a string.
 */
 function h2(textToDisplay) {
-    var element = document.createElement("h2");
-    element.innerHTML = textToDisplay;
-    return element;
+	if(typeof textToDisplay != 'string'){
+		throw new TypeError('The text to display should be a string.');
+	}
+	
+	var element = document.createElement("h2");
+	element.innerHTML = textToDisplay;
+	return element;
 }
 
 
@@ -94,11 +132,17 @@ function h2(textToDisplay) {
 * @param String textToDisplay : the text to insert in the header.
 *
 * @return HTMLH3Element an element representing a header h3 element with the given text.
+*
+* @throw TypeError if textToDisplay is not a string.
 */
 function h3(textToDisplay) {
-    var element = document.createElement("h3");
-    element.innerHTML = textToDisplay;
-    return element;
+	if(typeof textToDisplay != 'string'){
+		throw new TypeError('The text to display should be a string.');
+	}
+
+	var element = document.createElement("h3");
+	element.innerHTML = textToDisplay;
+	return element;
 }
 
 
@@ -108,11 +152,17 @@ function h3(textToDisplay) {
 * @param String textToDisplay : the text to insert in the header.
 *
 * @return HTMLH4Element an element representing a header h4 element with the given text.
+*
+* @throw TypeError if textToDisplay is not a string.
 */
 function h4(textToDisplay) {
-    var element = document.createElement("h4");
-    element.innerHTML = textToDisplay;
-    return element;
+	if(typeof textToDisplay != 'string'){
+		throw new TypeError('The text to display should be a string.');
+	}
+
+	var element = document.createElement("h4");
+	element.innerHTML = textToDisplay;
+	return element;
 }
 
 

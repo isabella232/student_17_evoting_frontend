@@ -70,11 +70,13 @@ function logout(){
 /**
 * Mock the authentication with the given sciper.
 *
-* @param sciper : the sciper of which we want to mock the authentication.
+* @param String sciper : the sciper of which we want to mock the authentication.
+*
+* @throw TypeError if the sciper is not a string.
 */
 function mockAuthentication(sciper){
-	if(typeof sciper != 'number'){
-		throw new TypeError('The sciper should be a number');
+	if(typeof sciper != 'string'){
+		throw new TypeError('The sciper should be a string');
 	}
 
 	userSciper = sciper;

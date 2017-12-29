@@ -13,7 +13,8 @@ var sessionToken;
 /**
 * Send a Login message to the cothority, asking for available elections.
 *
-* @param loginRequest : a Login message as described in the proto file.
+* @param String sciper : the sciper of the user.
+* @param Uint8Array signature : the signature of the authentication server.
 */
 function sendLoginRequest(sciper, signature){
 
@@ -39,10 +40,27 @@ function sendLoginRequest(sciper, signature){
 /**
 * Send a Cast message to the election. An encrypted ballot is sended with the given choice in it.
 *
-* @param election : the elections we want to vote in.
-* @param choice : the choice of the user in the election.
+* @param Election election : the elections we want to vote in.
+* @param Number choice : the choice of the user in the election.
+*
+* @throw TypeError if choice is not a number.
+* @throw TypeError if the key field of the election is invalid.
+* @throw TypeError if the id field of the election is invalid.
+* @throw RangeError if the choice is not a 6 or 7 digits.
 */
 function submitVote(election, choice){
+	if(typeof choice != 'number'){
+		throw new TypeError('The choice should be a number.');
+	}
+	if(choice < 100000 || choice > 9999999){
+		throw new RangeError('The sciper number should be a 6 or 7 digits number.');
+	} 
+	if(typeof election.key != 'object'){
+		throw new TypeError('The given election has an invalid key field.');
+	}
+	if(typeof election.id != 'string'){
+		throw new TypeError('The given election has an invalid id field.');
+	}
   	
 	var tmp = choice;
 	var n0 = tmp & 0xFF;
@@ -84,8 +102,21 @@ function submitVote(election, choice){
 * Contacts the cothority to get the decrypted results of the election and then display them.
 *
 * @param Election election : the election from which we want to get the result.
+*
+* @throw TypeError if the stage field of the election is invalid.
+* @throw typeError if the id field of the election is invalid.
+* @throw RangeError if hte stage field of the election is not in the range [0, 2].
 */
 function decryptAndDisplayElectionResult(election){
+	if(typeof election.stage != 'number'){
+		throw new TypeError('The given election has an invalid stage field.');
+	}
+	if(election.stage < 0 || election.stage > 2){
+		throw new RangeError('The stage of the election should be between 0 and 2.');
+	}
+	if(typeof election.id != 'string'){
+		throw new TypeError('The given election has an invalid id field.');
+	}
 
 	if(election.stage < 2){
 
@@ -119,11 +150,17 @@ function decryptAndDisplayElectionResult(election){
 * Election comparator.
 * An election is considered superior to another if its end date is after the other election's end date.
 *
-* @param election1 : the first election.
-* @param election2 : the second election.
+* @param Election election1 : the first election.
+* @param Election election2 : the second election.
 *
-* @return the result of the comparison between the two end dates.
+* @return boolean the result of the comparison between the two end dates.
+*
+* @throws TypeError if either of the two deadlines of the elections is not a string.
 */
 function compareByDate(election1, election2){
+	if(typeof election1.end != 'string' || typeof election2.end != 'string'){
+		throw new TypeError('The deadline of an election should be a string.');
+	}
+
 	return createDateFromString(election1.end) < createDateFromString(election2.end);
 }
