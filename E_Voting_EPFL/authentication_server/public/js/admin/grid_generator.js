@@ -12,13 +12,25 @@ var id = 0;
 /**
 * Generates a grid for the results of an election.
 * 
-* @param Array[Object] results : an array representing the election.
-* Each object in the results array should have the following fields : 
-* - recid : which should be unique for each object.
-* - sciper : the sciper of a participant of the election.
-* - votes : the number of votes this participant get.
+* @param Ballot[] results : an array representing the election results.
+* Each ballots in the results array should have the following fields : 
+* - Number recid : which should be unique for each object.
+* - String sciper : the sciper of a participant of the election.
+* - Number votes : the number of votes this participant get.
+*
+* @throw TypeError if results is not an array.
+* @throw TypeError if at least one of the ballots does not respect the desired format.
 */
 function generateResultGrid(results){
+	if(typeof results != 'object' || typeof results.length != 'number'){
+		throw new TypeError('The given results is not an array.');
+	}
+	for(var i = 0; i < results.length; i++){
+		var ballot = results[i];
+		if(typeof ballot.recid != 'number' || typeof ballot.sciper != 'number' || typeof ballot.votes != 'number'){
+			throw new TypeError('At least one of the ballots does not respect the desired format.');
+		}
+	}
 
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 
@@ -48,14 +60,26 @@ function generateResultGrid(results){
 /**
 * Generate a grid to represent encrypted ballots.
 *
-* @param Array[Object] ballots : the ballots to display.
+* @param Ballot[] ballots : the ballots to display.
 * The ballots should have the following fields :
-* - user : the sciper of a participant of the election.
-* - alpha : the alpha field of the ElGamal encryption of the ballot.
-* - beta : the beta field of the ElGamal encryption of the ballot.
+* - Number user : the sciper of a participant of the election.
+* - String alpha : the alpha field of the ElGamal encryption of the ballot.
+* - String beta : the beta field of the ElGamal encryption of the ballot.
+*
+* @throw TypeError if results is not an array.
+* @throw TypeError if one of the ballots does not respect the desired format.
 */
 function generateEncryptedBallotsGrid(ballots){
-	
+	if(typeof ballots != 'object' || typeof ballots.length != 'number'){
+		throw new TypeError('The given ballots is not an array.');
+	}
+	for(var i = 0; i < ballots.length; i++){
+		var ballot = ballots[i];
+		if(typeof ballot.user != 'number' || typeof ballot.alpha != 'string' || typeof ballot.beta != 'string'){
+			throw new TypeError('At least one of the ballots does not respect the desired format.');
+		}
+	}
+
 	$("#div2").append(paragraph("If the results does not appear in the grid, please click on its refresh button."));
 
 	$("#div2").append(createGrid("gridDiv")); 

@@ -94,8 +94,28 @@ function displayElectionCreation(){
 * @param String description : the description of the election.
 * @param Number[] participants : the list of the scipers of the participants of the election.
 * @param Number[] voters : the list of the scipers of the voters of the election. 
+*
+* @throw TypeError if participants is not an array of numbers.
+* @throw TypeError if voters is not an array of numbers.
 */
 function electionConfirmation(name, deadline, description, participants, voters){
+	if(typeof participants != 'object' || typeof participants.length != 'number'){
+		throw new TypeError('The given participants array is invalid.');
+	}
+	for(var i = 0; i < participants.length; i++){
+		if(typeof participants[i] != 'number'){
+			throw new TypeError('At least one of the participants is not a number.');
+		}
+	}
+	
+	if(typeof voters != 'object' || typeof voters.length != 'number'){
+		throw new TypeError('The given voters array is invalid.');
+	}
+	for(var i= 0; i < voters.length; i++){
+		if(typeof voters[i] != 'number'){
+			throw new TypeError('At least one of the voters is not a number.');
+		}
+	}	
 
 	clearDisplay();
 	$("#div1").append(createCenteredDiv("details"));
@@ -138,8 +158,29 @@ function electionConfirmation(name, deadline, description, participants, voters)
 * @param String description : the description of the election.
 * @param Number[] participants : the scipers of the participants.
 * @param Number[] voters : the scipers of the voters.
+*
+* @throw TypeError if participants is not an array of numbers.
+* @throw TypeError if voters is not an array of numbers.
 */
 function injectElectionDetails(name, deadline, description, participants, voters){
+	if(typeof participants != 'object' || typeof participants.length != 'number'){
+		throw new TypeError('The given participants array is invalid.');
+	}
+	for(var i = 0; i < participants.length; i++){
+		if(typeof participants[i] != 'number'){
+			throw new TypeError('At least one of the participants is not a number.');
+		}
+	}
+	
+	if(typeof voters != 'object' || typeof voters.length != 'number'){
+		throw new TypeError('The given voters array is invalid.');
+	}
+	for(var i= 0; i < voters.length; i++){
+		if(typeof voters[i] != 'number'){
+			throw new TypeError('At least one of the voters is not a number.');
+		}
+	}
+
 	$("input[type='text'][name='name']").val(name);
 	$("input[type='text'][name='deadline']").val(deadline);
 	$("textarea[name='description']").val(description);

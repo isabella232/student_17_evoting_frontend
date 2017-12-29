@@ -18,9 +18,13 @@ var id = 0;
 * - String sciper : the sciper of a participant of the election.
 * - Number votes : the number of votes this participant get.
 *
+* @throw TypeError if results is not an array.
 * @throw TypeError if at least one of the ballots does not respect the desired format.
 */
 function generateResultGrid(results){
+	if(typeof result != 'object' || typeof result.length != 'number'){
+		throw new TypeError('The given results is not an array.');
+	}
 	for(var i = 0; i < results.length; i++){
 		var ballot = results[i];
 		if(typeof ballot.recid != 'number' || typeof ballot.sciper != 'number' || typeof ballot.votes != 'number'){
@@ -59,15 +63,19 @@ function generateResultGrid(results){
 * @param Object[] ballots : the ballots to display.
 * The ballots should have the following fields :
 * - Number user : the sciper of a participant of the election.
-* - Uint8Array alpha : the alpha field of the ElGamal encryption of the ballot.
-* - Uint8Array beta : the beta field of the ElGamal encryption of the ballot.
+* - String alpha : the alpha field of the ElGamal encryption of the ballot.
+* - String beta : the beta field of the ElGamal encryption of the ballot.
 *
+* @throw TypeError if results is not an array.
 * @throw TypeError if one of the ballots does not respect the desired format.
 */
 function generateEncryptedBallotsGrid(ballots){
+	if(typeof result != 'object' || typeof result.length != 'number'){
+		throw new TypeError('The given results is not an array.');
+	}
 	for(var i = 0; i < ballots.length; i++){
 		var ballot = ballots[i];
-		if(typeof ballot.user != 'number' || typeof ballot.alpha != 'object' || typeof ballot.beta != 'object'){
+		if(typeof ballot.user != 'number' || typeof ballot.alpha != 'string' || typeof ballot.beta != 'string'){
 			throw new TypeError('At least one of the ballots does not respect the desired format.');
 		}
 	}

@@ -7,9 +7,21 @@
 /**
 * Display all elections available in a list.
 *
-* @param Array{Election} elections : the election list to display.
+* @param Election[] elections : the election list to display.
+*
+* @throw TypeError if elections is not an array.
+* @throw TypeError if one of the election's creator field is invalid.
 */
 function displayElections(elections){
+	if(typeof elections != 'object' || typeof elections.length != 'number'){
+		throw new TypeError('The given election array is invalid.');
+	}
+	for(var i = 0; i < elections.length; i++){
+		if(typeof elections[i].creator != 'number'){
+			throw new TypeError('At least one of the election\'s creator is not well defined.');
+		} 
+	}
+
     	clearDisplay();
 
     	if(elections.length > 0){
@@ -31,8 +43,18 @@ function displayElections(elections){
 * Display an election list item and associate an OnClickListener to it.
 *
 * @param Election election : the election to display as a list item.
+*
+* @throw TypeError if the stage of the election is not a number.
+* @throw RangeError if the stage of the election is not in the range [0, 2].
 */
 function displayElectionListItem(election){
+	if(typeof election.stage != 'number'){
+		throw new TypeError('The stage of the election is invalid.');
+	}
+	if(election.stage < 0 || election.stage > 2){
+		throw new RangeError('The stage of the election should be in the range [0, 2].');
+	}
+
     	$("#div1").append(clickableElement('h3', ''+election.name, function(){
 		displayElectionFull(election);
 	    }, "list_item"));
@@ -63,8 +85,23 @@ function displayElectionListItem(election){
 * Display all the informations of a given election and the radio buttons showing the possible votes.
 *
 * @param Election election : the election to display.
+*
+* @throw TypeError if the name of the election is not a string.
+* @throw TypeError if the users of the election is not an array of numbers.
 */
 function displayElectionFull(election){
+	if(typeof election.name != 'string'){
+		throw new TypeError('The given election has an invalid name field.');
+	}
+	if(typeof election.users != 'object' || typeof election.users.length != 'number'){
+		throw new TypeError('The given election has an invalid users field.');
+	}
+	for(var i= 0; i < election.users.length; i++){
+		if(typeof election.users[i] != 'number'){
+			throw new TypeError('At least one user of the election has a wrong format.');
+		}
+	}
+
 	clearDisplay();	
 
 	$("#div1").append(createCenteredDiv("details"));
@@ -119,9 +156,26 @@ function displayElectionFull(election){
 /**
 * Turns a uint8Array into a uint32Array representing the scipers.
 * 
-* @param array the array to convert 
+* @param Byte[] array the array to convert into scipers.
+* 
+* @return Number[] the recovered scipers.
+*
+* @throw TypeError if the given array is not an array of numbers.
+* @throw RangeError if the length of the array is not divisible by 3.
 */
 function uint8ArrayToScipers(array){
+	if(typeof array != 'object' || typeof array.length != 'number'){
+		throw new TypeError('The given array is not valid.');
+	}
+	for(var i = 0; i < array.length; i++){
+		if(typeof array[i] != 'number'){
+			throw new TypeError('At least one of the elements of the given array is invalid.');
+		}
+	}
+	if(array.length % 3 != 0){
+		throw new RangeError('The length of the array is not divisible by 3.');
+	}
+
 	var recovered = [];
 	for(var i = 0; 3*i < array.length; i ++){
 		recovered[i] = array[3*i] + array[3*i + 1] * 0x100 + array[3*i + 2] * 0x10000;
@@ -201,9 +255,24 @@ function displayChooseAggregate(election){
 * Displays the result of the election in a grid.
 * 
 * @param Election election : the election of which we want to display the result.
-* @param Array[Ballot] ballots : the list of the decrypted ballots of the election.
+* @param Ballot[] ballots : the list of the decrypted ballots of the election.
+*
+* @throw TypeError if the users field of the election is not an array.
+* @throw TypeError if ballots is not an array.
+* @throw TypeError if one of the element of ballots has an invalid text field.
 */
 function displayElectionResult(election, ballots){
+	if(typeof election.users != 'object' || typeof election.users.length != 'number'){
+		throw new TypeError('The users field of the election is invalid.');
+	}
+	if(typeof ballots != 'object' || typeof ballots.length != 'number'){
+		throw new TypeError('The given ballots array is invalid.');
+	}
+	for(var i =0; i < ballots.length; i++){
+		if(typeof ballots[i].text != 'object' || typeof ballots[i].text.length != 'number'){
+			throw new TypeError('At least one of the ballots\' text field is invalid.');
+		}
+	}
 
 	$("#div2").append(paragraph("Election result : "));
 	
@@ -241,8 +310,19 @@ function displayElectionResult(election, ballots){
 
 /**
 * compares a key / value pair by comparing their values.
+*
+* @param Object pair1 the first key / value pair to compare.
+* @param Object pair2 the second key / value pair to compare.
+*
+* @return the result of the comparison of the values of the pairs.
+*
+* @throw TypeError if the value field of one of the pair is not a number.
 */
 function comparePairs(pair1, pair2){
+	if(typeof pair1.value != 'number' || typeof pair2.value != 'number'){
+		throw new TypeError('At least one the pairs\' value field is not a number.');
+	}
+
 	return pair1.value < pair2.value;
 }
 
@@ -252,9 +332,19 @@ function comparePairs(pair1, pair2){
 * - The sciper of the voter.
 * - His encrypted ElGalmal pair [alpha, beta].
 *
-* @param Array[Ballot] box : a list of ballots. 
+* @param Ballot[] box : a list of ballots. 
+*
+* @throw TypeError if the box is not an array of ballots.
 */
 function displayBallotBox(box){
+	if(typeof box != 'object' || typeof box.length != 'number'){
+		throw new TypeError('The given box is not an array.');
+	}
+	for(var i = 0; i < box.length; i++){
+		if(typeof box[i].user != 'number'){
+			throw new TypeError('At least one of the ballots in the box is invalid.');
+		}
+	}
 
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){
@@ -277,9 +367,19 @@ function displayBallotBox(box){
 * - The sciper of the voter.
 * - His encrypted shuffled ElGalmal pair [alpha, beta].
 *
-* @param Array[Ballot] box : a list of ballots. 
+* @param Ballot[] box : a list of ballots.
+*
+* @throw TypeError if the box is not an array of ballots. 
 */
 function displayShuffledBox(box){
+	if(typeof box != 'object' || typeof box.length != 'number'){
+		throw new TypeError('The given box is not an array.');
+	}
+	for(var i = 0; i < box.length; i++){
+		if(box[i].user != 'number'){
+			throw new TypeError('At least one of the ballots in the box is invalid.');
+		}
+	}
 
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){

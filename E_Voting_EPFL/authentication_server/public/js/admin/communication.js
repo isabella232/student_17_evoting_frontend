@@ -24,16 +24,16 @@ function sendLoginRequest(sciper, signature){
 	}
 
 	socket.send('Login', 'LoginReply', loginRequest).then((data) => {
-	if(data.admin){
-		clearDisplay();
-		showNavConnected();
-		sessionToken = data.token;
-		recoveredElections = data.elections;
-		recoveredElections = recoveredElections.sort(compareByDate);
-		displayElections(recoveredElections);
-	}else{
-		$("#errDiv").append(paragraph("An admin account is required to access this site."));
-	}
+		if(data.admin){
+			clearDisplay();
+			showNavConnected();
+			sessionToken = data.token;
+			recoveredElections = data.elections;
+			recoveredElections = recoveredElections.sort(compareByDate);
+			displayElections(recoveredElections);
+		}else{
+			$("#errDiv").append(paragraph("An admin account is required to access this site."));
+		}
 	}).catch((err) => {
 		console.log(err);
 	});
@@ -47,8 +47,8 @@ function sendLoginRequest(sciper, signature){
 * @param String name : the name of the election.
 * @param String deadline : the deadline of the election, have to be in the format DD/MM/YYYY.
 * @param String description : the description of the election.
-* @param Uint32[] participants : the list of the participants of the election.
-* @param Uint32[] voters : the list of the voter of the election.
+* @param Number[] participants : the list of the participants of the election.
+* @param Number[] voters : the list of the voter of the election.
 */
 function createElection(name, deadline, description, participants, voters){
 
@@ -74,7 +74,7 @@ function createElection(name, deadline, description, participants, voters){
 		    user : userSciper,
 		    signature : new Uint8Array([])
 		}
-		//Return on election list
+		/* Return on election list. */
 		sendLoginRequest(loginRequest);
 	}).catch((err) => {
 		console.log(err);	
@@ -82,7 +82,24 @@ function createElection(name, deadline, description, participants, voters){
 }
 
 
+/**
+* Recover scipers from Uint8Array.
+*
+* @param Bytes[] voters, the array to transform.
+*
+* @return Number[] the transformed array.
+*
+* @throw TypeError if voters is invalid.
+* @throw RangeError if the length of the voters array is not divisible by 3.
+*/
 function votersToUint8Array(voters){
+	if(typeof voters != 'object' || typeof voters.length != 'number'){
+		throw new TypeError('The voters given as argument is not a valid array.');
+	}
+	if(voters.length % 3 != 0){
+		throw new RangeError('The size of the voters array is not divisible by 3, hence the array is not valid.');
+	}
+
 	var transVoters = [];
 	for(var i = 0; i < voters.length; i++){
 		var voter = voters[i];
@@ -100,8 +117,13 @@ function votersToUint8Array(voters){
 * Send a Shuffle message to the conodes, initiating the shuffle of the given election.
 *
 * @param Election election : the election to finalize.
+*
+* @throw TypeError if the id field of election is not valid.
 */
 function finalize(election){
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
 
 	var finalizeMessage = {
 		token : sessionToken,
@@ -124,8 +146,14 @@ function finalize(election){
 * Send a Decrypt message to the conodes, initiating the decryption of the ballots.
 *
 * @param Election election : the election of which we want to decrypt the ballots.
+*
+* @throw TypeError if the id field of election is not valid.
 */
 function decryptBallots(election){
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+
 	var decryptBallotsMessage = {
 		token: sessionToken,
 		genesis: election.id
@@ -143,8 +171,21 @@ function decryptBallots(election){
 * Contacts the cothority to get the decrypted results of the election and then display them.
 *
 * @param Election election : the election from which we want to get the result.
+*
+* @throw TypeError if the id field of election is not valid.
+* @throw TypeError if the stage filed of election is not valid.
+* @throw RangeError if the stage field of election is not in the range [0, 2]. 
 */
 function decryptAndDisplayElectionResult(election){
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+	if(typeof election.stage != 'number'){
+		throw new TypeError('The field stage of the given election should be a number.');
+	}
+	if(election.stage < 0 || election.stage > 2){
+		throw new RangeError('The stage of the election should be in the range [0, 2].');
+	}
 
 	if(election.stage < 2){
 
@@ -178,8 +219,14 @@ function decryptAndDisplayElectionResult(election){
 * Send an aggregate message to the conodes to aggregate the encrypted ballots.
 *
 * @param Election election : the election of which we want to aggregate the ballots.
+*
+* @throw TypeError if the id field of election is not valid.
 */
 function aggregateBallot(election){
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+
 	var aggregateBallotMessage = {
 		token : sessionToken,
 		genesis : election.id,
@@ -198,8 +245,14 @@ function aggregateBallot(election){
 * Send an aggregate message to the conodes to aggregate the encrypted and shuffled ballots.
 *
 * @param Election election : the election of which we want to aggregate the ballots.
+*
+* @throw TypeError if the id field of election is not valid.
 */
 function aggregateShuffle(election){
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+
 	var aggregateShuffleMessage = {
 		token : sessionToken,
 		genesis : election.id,
@@ -220,8 +273,15 @@ function aggregateShuffle(election){
 *
 * @param election1 : the first election.
 * @param election2 : the second election.
+*
 * @return the result of the comparison between the two end dates.
+*
+* @throw TypeError if one of the election's deadline is invalid.
 */
 function compareByDate(election1, election2){
+	if(typeof election1.end != 'string' || typeof election2.end != 'string'){
+		throw new TypeError('One of the election\'s end field isn\'t a string.');
+	}
+
 	return createDateFromString(election1.end) < createDateFromString(election2.end);
 }
