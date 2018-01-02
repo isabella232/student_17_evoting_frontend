@@ -2,6 +2,9 @@
 * Grid_generator.
 * Contains all the methods allowing to generate w2ui grids and display them in the division #div2.
 * Be aware that a specific format as to be respected for the ballots given as arguments.
+*
+* The grids are generated using the open source W2UI library : 
+*	https://github.com/vitmalina/w2ui
 */
 
 
