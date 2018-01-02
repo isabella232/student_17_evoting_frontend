@@ -10,7 +10,8 @@ var id = 0;
 
 
 /**
-* Generates a grid for the results of an election.
+* Generates a grid for the results of an election. 
+* This grid contains the participants sorted with their number of votes which itself is displayed.
 * 
 * @param Ballot[] results : an array representing the election results.
 * Each ballots in the results array should have the following fields : 
@@ -61,6 +62,8 @@ function generateResultGrid(results){
 
 /**
 * Generate a grid to represent encrypted ballots.
+* The grid display for each ballots the sciper number of the voter along with
+* the ElGamal encryption pair of the ballot.
 *
 * @param Ballot[] ballots : the ballots to display.
 * The ballots should have the following fields :
@@ -104,6 +107,53 @@ function generateEncryptedBallotsGrid(ballots){
 		{ field: 'user', caption: 'Sciper', type: 'text' }
 		],
 		sortData: [{ field: 'user', direction: 'ASC' }],
+		records: ballots
+	});
+}
+
+
+/**
+* Generate a grid to represent shuffled ballots.
+* The grid display the shuffled ballots without the sciper of the voter which is
+* expected considering that the shuffle is made to lose the trace of the original 
+* ballot.
+*
+* @param Ballot[] ballots : the ballots to display.
+* The ballots should have the following fields :
+* - String alpha : the alpha field of the ElGamal encryption of the ballot.
+* - String beta : the beta field of the ElGamal encryption of the ballot.
+*
+* @throw TypeError if results is not an array.
+* @throw TypeError if one of the ballots does not respect the desired format.
+*/
+function generateShuffledBallotsGrid(ballots){
+	/* Type check. */
+	if(typeof ballots != 'object' || typeof ballots.length != 'number'){
+		throw new TypeError('The given ballots is not an array.');
+	}
+	for(var i = 0; i < ballots.length; i++){
+		var ballot = ballots[i];
+		if(typeof ballot.alpha != 'string' || typeof ballot.beta != 'string'){
+			throw new TypeError('At least one of the ballots does not respect the desired format.');
+		}
+	}
+	/* End type check. */
+
+	$("#div2").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
+
+	$("#div2").append(createGrid("gridDiv")); 
+		
+	$('#gridDiv').w2grid({
+		name: "Grid"+(id++),
+		header: 'List of Ballots',
+		show: {
+		toolbar: true,
+		footer: true
+		},
+		columns: [
+		{ field: 'alpha', caption: 'Alpha', size: '50%', sortable: true, resizable: true },
+		{ field: 'beta', caption: 'Beta', size: '50%', sortable: true, resizable: true }
+		],
 		records: ballots
 	});
 }

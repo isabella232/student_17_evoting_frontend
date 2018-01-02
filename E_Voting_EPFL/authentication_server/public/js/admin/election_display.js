@@ -260,7 +260,7 @@ function displayChooseAggregate(election){
 	$("#select").append(clickableElement("button", "Result", function(){
 		$("#div2").empty();
 			displayChooseAggregate(election);
-			decryptAndDisplayElectionResult(election);
+			aggregateResult(election);
 		}));
 }
 
@@ -398,7 +398,7 @@ function displayShuffledBox(box){
 		throw new TypeError('The given box is not an array.');
 	}
 	for(var i = 0; i < box.length; i++){
-		if(box[i].user != 'number'){
+		if(typeof box[i].alpha != 'object' || typeof box[i].beta != 'object'){
 			throw new TypeError('At least one of the ballots in the box is invalid.');
 		}
 	}
@@ -409,12 +409,11 @@ function displayShuffledBox(box){
 		var ballot = box[i];
 		var numberedBallot = {
 			recid: i,
-			user: ballot.user,
 			alpha: dedis.misc.uint8ArrayToHex(ballot.alpha), 
 			beta: dedis.misc.uint8ArrayToHex(ballot.beta)
 		}
 		numberedBallots[i] = numberedBallot;
 	}
 
-	generateEncryptedBallotsGrid(numberedBallots);
+	generateShuffledBallotsGrid(numberedBallots);
 }

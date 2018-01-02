@@ -144,7 +144,7 @@ function displayElectionFull(election){
 
 	clearDisplay();	
 
-	$("#div1").append(createDiv("details"));
+	$("#div1").append(createCenteredDiv("details"));
 
 	$("#details").append("<h2>"+election.name+"</h2>");
 	$("#details").append(paragraph("Created by  : "+election.creator));
@@ -181,9 +181,36 @@ function displayElectionFull(election){
 			$("#details").append(h4("Please wait for the administrator of the election to finalize it."));
 			$("#details").append(h4("The result will then be displayed here"));
 		}else{
-			decryptAndDisplayElectionResult(election)
+			displayChooseAggregate(election)
 		}
 	}
+}
+
+
+/**
+* Display the different aggregations possible for the given election.
+*
+* @param Election election : the election concerned.
+*/
+function displayChooseAggregate(election){
+	$("#div2").empty();
+	$("#div2").append(createCenteredDiv("select"));
+	$("#select").append(paragraph("Show one of the following steps :"));
+	$("#select").append(clickableElement("button", "Voting", function(){
+		$("#div2").empty();
+			displayChooseAggregate(election);
+			aggregateBallot(election);
+		}));
+	$("#select").append(clickableElement("button", "Shuffle", function(){
+		$("#div2").empty();
+			displayChooseAggregate(election);
+			aggregateShuffle(election);
+		}));
+	$("#select").append(clickableElement("button", "Result", function(){
+		$("#div2").empty();
+			displayChooseAggregate(election);
+			aggregateResult(election);
+		}));
 }
 
 
@@ -219,6 +246,8 @@ function uint8ArrayToScipers(array){
 * @param Election election : the election of which we want to display the result.
 * @param Ballot[] ballots : the list of the decrypted ballots of the election.
 *
+* A division with ID "grid_details" in the document have to be available.
+*
 * @throw TypeError if the user field of the election is invalid.
 * @throw TypeError if ballots is invalid.
 * @throw TypeError if at least one of the instances of ballots is invalid.
@@ -237,8 +266,6 @@ function displayElectionResult(election, ballots){
 		}
 	}
 	/* End type check. */
-
-	$("#div2").append(paragraph("Election result : "));
 	
 	/* Computes the results from the given ballots. */
 	var pairArray = [];
@@ -250,6 +277,10 @@ function displayElectionResult(election, ballots){
 		var ballot = ballots[j];
 		var array = ballot.text;
 		var plain = array[0]+0x100*array[1]+0x10000*array[2];
+
+		if(ballot.user == userSciper){
+			$("#grid_details").append(paragraph("Your vote : "+plain)); 
+		}
 
 		var index;
 		for(var i = 0; i < pairArray.length; i++){
@@ -271,6 +302,93 @@ function displayElectionResult(election, ballots){
 
 	generateResultGrid(displayedArray);
 	
+}
+
+
+/**
+* Display a list of encrypted ballots in a grid. Three fields are displayed :
+* - The sciper of the voter.
+* - His encrypted ElGalmal pair [alpha, beta].
+*
+* A division with ID "grid_details" in the document have to be available.
+*
+* @param Ballot[] box : a list of ballots. 
+*
+* @throw TypeError if the box is not an array of ballots.
+*/
+function displayBallotBox(box){
+	/* Type check. */
+	if(typeof box != 'object' || typeof box.length != 'number'){
+		throw new TypeError('The given box is not an array.');
+	}
+	for(var i = 0; i < box.length; i++){
+		if(typeof box[i].user != 'number'){
+			throw new TypeError('At least one of the ballots in the box is invalid.');
+		}
+	}
+	/* End type check. */
+
+	var numberedBallots = [];
+	for(var i = 0; i < box.length; i++){
+		var ballot = box[i];
+		var numberedBallot = {
+			recid: i,
+			user: ballot.user,
+			alpha: dedis.misc.uint8ArrayToHex(ballot.alpha), 
+			beta: dedis.misc.uint8ArrayToHex(ballot.beta)
+		}
+		if(ballot.user == userSciper){
+			$("#grid_details").append(paragraph("Your ballot's encryption pair : "));
+			$("#grid_details").append(paragraph(numberedBallot.alpha));
+			$("#grid_details").append(paragraph(numberedBallot.beta));
+		}
+		numberedBallots[i] = numberedBallot;
+	}
+
+	generateEncryptedBallotsGrid(numberedBallots);
+}
+
+
+/**
+* Display a list of shuffled ballots in a grid. Three fields are displayed :
+* - The sciper of the voter.
+* - His encrypted shuffled ElGalmal pair [alpha, beta].
+*
+* A division with ID "grid_details" in the document have to be available.
+*
+* @param Ballot[] box : a list of ballots.
+*
+* @throw TypeError if the box is not an array of ballots. 
+*/
+function displayShuffledBox(box){
+	/* Type check. */
+	if(typeof box != 'object' || typeof box.length != 'number'){
+		throw new TypeError('The given box is not an array.');
+	}
+	for(var i = 0; i < box.length; i++){
+		if(typeof box[i].alpha != 'object' || typeof box[i].beta != 'object'){
+			throw new TypeError('At least one of the ballots in the box is invalid.');
+		}
+	}
+	/* End type check. */
+
+	var numberedBallots = [];
+	for(var i = 0; i < box.length; i++){
+		var ballot = box[i];
+		var numberedBallot = {
+			recid: i,
+			alpha: dedis.misc.uint8ArrayToHex(ballot.alpha), 
+			beta: dedis.misc.uint8ArrayToHex(ballot.beta)
+		}
+		if(ballot.user == userSciper){
+			$("#grid_details").append(paragraph("Your shuffled ballot's encryption pair : "));
+			$("#grid_details").append(paragraph(numberedBallot.alpha));
+			$("#grid_details").append(paragraph(numberedBallot.beta));
+		}
+		numberedBallots[i] = numberedBallot;
+	}
+
+	generateShuffledBallotsGrid(numberedBallots);
 }
 
 

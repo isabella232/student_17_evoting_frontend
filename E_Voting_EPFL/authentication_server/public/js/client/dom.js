@@ -44,6 +44,9 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 }
 
 
+
+
+
 /**
 * Create a division with the given ID and a text alignment set to left.
 *
@@ -53,7 +56,7 @@ function clickableElement(elementType, textToDisplay, onClick, className){
 *
 * @throw TypeError if id is not a string.
 */
-function createDiv(id){
+function createCenteredDiv(id){
 	/* Type check. */
 	if(typeof id != 'string'){
 		throw new TypeError('The id of the new div should be a string.');

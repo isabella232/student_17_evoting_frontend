@@ -112,7 +112,7 @@ function submitVote(election, choice){
 * @throw typeError if the id field of the election is invalid.
 * @throw RangeError if hte stage field of the election is not in the range [0, 2].
 */
-function decryptAndDisplayElectionResult(election){
+function aggregateResult(election){
 	/* Type check. */
 	if(typeof election.stage != 'number'){
 		throw new TypeError('The given election has an invalid stage field.');
@@ -134,6 +134,8 @@ function decryptAndDisplayElectionResult(election){
 		}
 		socket.send('Decrypt', 'DecryptReply', decryptBallotsMessage).then((data) => {
 			election.stage = 2;
+			$("#div2").append(createCenteredDiv("grid_details"));
+			$("#grid_details").append(paragraph("Election results : "));
 			displayElectionResult(election, data.decrypted.ballots);
 		}).catch((err) => {
 			displayError('An error occured during the decryption of the election.');
@@ -149,12 +151,74 @@ function decryptAndDisplayElectionResult(election){
 			type : 2
 		}
 		socket.send('Aggregate', 'AggregateReply', aggregateDecryptedMessage).then((data) => {
+			$("#div2").append(createCenteredDiv("grid_details"));
+			$("#grid_details").append(paragraph("Election results : "));
 			displayElectionResult(election, data.box.ballots);
 		}).catch((err) => {
 			displayError('An error occured during the aggregation of the ballots.');
 			console.log(err);
 		});
 	}
+}
+
+
+/**
+* Send an aggregate message to the conodes to aggregate the encrypted ballots.
+*
+* @param Election election : the election of which we want to aggregate the ballots.
+*
+* @throw TypeError if the id field of election is not valid.
+*/
+function aggregateBallot(election){
+	/* Type check. */
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+	/* End type check. */
+
+	var aggregateBallotMessage = {
+		token : sessionToken,
+		genesis : election.id,
+		type : 0
+	}
+	socket.send('Aggregate', 'AggregateReply', aggregateBallotMessage).then((data) => {
+		$("#div2").append(createCenteredDiv("grid_details"));
+		$("#grid_details").append(paragraph("Original ballots : "));
+		displayBallotBox(data.box.ballots);
+	}).catch((err) => {
+		displayError('An error occured during the aggregation of the ballots.');
+		console.log(err);
+	});
+}
+
+
+/**
+* Send an aggregate message to the conodes to aggregate the encrypted and shuffled ballots.
+*
+* @param Election election : the election of which we want to aggregate the ballots.
+*
+* @throw TypeError if the id field of election is not valid.
+*/
+function aggregateShuffle(election){
+	/* Type check. */
+	if(typeof election.id != 'string'){
+		throw new TypeError('The field id of the given election should be a string.');
+	}
+	/* End type check. */
+
+	var aggregateShuffleMessage = {
+		token : sessionToken,
+		genesis : election.id,
+		type : 1
+	}
+	socket.send('Aggregate', 'AggregateReply', aggregateShuffleMessage).then((data) => {
+		$("#div2").append(createCenteredDiv("grid_details"));
+		$("#grid_details").append(paragraph("Shuffled ballots : "));
+		displayShuffledBox(data.box.ballots);
+	}).catch((err) => {
+		displayError('An error occured during the aggregation of the ballots.');
+		console.log(err);
+	});
 }
 
 

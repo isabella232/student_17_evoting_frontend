@@ -185,7 +185,7 @@ function decryptBallots(election){
 * @throw TypeError if the stage filed of election is not valid.
 * @throw RangeError if the stage field of election is not in the range [0, 2]. 
 */
-function decryptAndDisplayElectionResult(election){
+function aggregateResult(election){
 	/* Type check. */
 	if(typeof election.id != 'string'){
 		throw new TypeError('The field id of the given election should be a string.');
