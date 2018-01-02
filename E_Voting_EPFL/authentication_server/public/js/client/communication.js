@@ -28,7 +28,7 @@ function sendLoginRequest(sciper, signature){
 		clearDisplay();
 		sessionToken = data.token;
 		recoveredElections = data.elections;
-		recoveredElections = recoveredElections.sort(compareByDate); //Sort election by deadlines.
+		recoveredElections.sort(compareByDate); //Sort election by deadlines.
 		displayElections(recoveredElections);
 	}).catch((err) => {
 		displayError('An error occured during the login, please try again later.');

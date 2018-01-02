@@ -31,7 +31,7 @@ function sendLoginRequest(sciper, signature){
 			showNavConnected();
 			sessionToken = data.token;
 			recoveredElections = data.elections;
-			recoveredElections = recoveredElections.sort(compareByDate);
+			recoveredElections.sort(compareByDate);
 			displayElections(recoveredElections);
 		}else{
 			/* The user is not an admin. */
@@ -291,19 +291,19 @@ function aggregateShuffle(election){
 * Election comparator.
 * An election is considered superior to another if its end date is after the other election's end date.
 *
-* @param election1 : the first election.
-* @param election2 : the second election.
+* @param Election election1 : the first election.
+* @param Election election2 : the second election.
 *
-* @return the result of the comparison between the two end dates.
+* @return boolean the result of the comparison between the two end dates.
 *
-* @throw TypeError if one of the election's deadline is invalid.
+* @throws TypeError if either of the two deadlines of the elections is not a string.
 */
 function compareByDate(election1, election2){
 	/* Type check. */
 	if(typeof election1.end != 'string' || typeof election2.end != 'string'){
-		throw new TypeError('One of the election\'s end field isn\'t a string.');
+		throw new TypeError('The deadline of an election should be a string.');
 	}
 	/* End type check. */
-
+	
 	return createDateFromString(election1.end) < createDateFromString(election2.end);
 }

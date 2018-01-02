@@ -268,9 +268,12 @@ function displayElectionResult(election, ballots){
 	/* End type check. */
 	
 	/* Computes the results from the given ballots. */
+
+	var participants = uint8ArrayToScipers(election.data);
+
 	var pairArray = [];
-	for(var i = 0; i < election.users.length; i++){
-		pairArray[i] = {key: election.users[i], value: 0};
+	for(var i = 0; i < participants.length; i++){
+		pairArray[i] = {key: participants[i], value: 0};
 	}
 
 	for(var j = 0; j < ballots.length; j++){
