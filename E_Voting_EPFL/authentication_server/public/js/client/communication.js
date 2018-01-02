@@ -134,8 +134,6 @@ function aggregateResult(election){
 		}
 		socket.send('Decrypt', 'DecryptReply', decryptBallotsMessage).then((data) => {
 			election.stage = 2;
-			$("#div2").append(createCenteredDiv("grid_details"));
-			$("#grid_details").append(paragraph("Election results : "));
 			displayElectionResult(election, data.decrypted.ballots);
 		}).catch((err) => {
 			displayError('An error occured during the decryption of the election.');
@@ -151,8 +149,6 @@ function aggregateResult(election){
 			type : 2
 		}
 		socket.send('Aggregate', 'AggregateReply', aggregateDecryptedMessage).then((data) => {
-			$("#div2").append(createCenteredDiv("grid_details"));
-			$("#grid_details").append(paragraph("Election results : "));
 			displayElectionResult(election, data.box.ballots);
 		}).catch((err) => {
 			displayError('An error occured during the aggregation of the ballots.');
@@ -182,8 +178,6 @@ function aggregateBallot(election){
 		type : 0
 	}
 	socket.send('Aggregate', 'AggregateReply', aggregateBallotMessage).then((data) => {
-		$("#div2").append(createCenteredDiv("grid_details"));
-		$("#grid_details").append(paragraph("Original ballots : "));
 		displayBallotBox(data.box.ballots);
 	}).catch((err) => {
 		displayError('An error occured during the aggregation of the ballots.');
@@ -212,8 +206,6 @@ function aggregateShuffle(election){
 		type : 1
 	}
 	socket.send('Aggregate', 'AggregateReply', aggregateShuffleMessage).then((data) => {
-		$("#div2").append(createCenteredDiv("grid_details"));
-		$("#grid_details").append(paragraph("Shuffled ballots : "));
 		displayShuffledBox(data.box.ballots);
 	}).catch((err) => {
 		displayError('An error occured during the aggregation of the ballots.');

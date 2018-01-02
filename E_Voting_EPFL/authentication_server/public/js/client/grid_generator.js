@@ -39,8 +39,7 @@ function generateResultGrid(results){
 	}
 	/* End type check. */
 
-	$("#grid_details").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
-
+	$("#div2").append(paragraph(""));
 	$("#div2").append(createGrid("gridDiv")); 
 		
 	$('#gridDiv').w2grid({
@@ -61,6 +60,8 @@ function generateResultGrid(results){
 		sortData: [{ field: 'recid', direction: 'ASC' }],
 		records: results
 	});
+
+	$("#div2").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
 }
 
 
@@ -91,8 +92,7 @@ function generateEncryptedBallotsGrid(ballots){
 	}
 	/* End type check. */
 
-	$("#grid_details").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
-
+	$("#div2").append(paragraph(""));
 	$("#div2").append(createGrid("gridDiv")); 
 		
 	$('#gridDiv').w2grid({
@@ -115,6 +115,8 @@ function generateEncryptedBallotsGrid(ballots){
 		sortData: [{ field: 'user', direction: 'ASC' }],
 		records: ballots
 	});
+
+	$("#div2").append(paragraph("If the ballots do not appear in the grid, please click on its refresh button."));
 }
 
 
@@ -147,8 +149,7 @@ function generateShuffledBallotsGrid(ballots){
 	}
 	/* End type check. */
 
-	$("#grid_details").append(paragraph("If the results do not appear in the grid, please click on its refresh button."));
-
+	$("#div2").append(paragraph(""));
 	$("#div2").append(createGrid("gridDiv")); 
 		
 	$('#gridDiv').w2grid({
@@ -168,4 +169,6 @@ function generateShuffledBallotsGrid(ballots){
 		],
 		records: ballots
 	});
+
+	$("#div2").append(paragraph("If the ballots do not appear in the grid, please click on its refresh button."));
 }

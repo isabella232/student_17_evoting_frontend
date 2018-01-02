@@ -35,14 +35,8 @@ $('document').ready(function(){
         var id = Number(userSciper);
         var signature = message[1];
         $('#div1').append(paragraph("Connecting, please wait ..."));
-       
-        const loginRequest = {
-            master : masterPin,
-            user : id,
-            signature : new Uint8Array([])
-        }
         
-        sendLoginRequest(loginRequest);
+        sendLoginRequest(id, new Uint8Array([]));
 		
     }
 });
@@ -71,17 +65,12 @@ function logout(){
 
 
 /**
-* Mock the authentication for the given SCIPER.
+* Mock the authentication for the given sciper.
 *
-* @param sciper : the sciper to mock the authentication.
+* @param Number sciper : the sciper to mock the authentication.
 */
 function mockAuthentication(sciper){
 	userSciper = sciper;
-	const loginRequest = {
-            master : masterPin,
-            user : userSciper,
-            signature : new Uint8Array([])
-        }
         
-        sendLoginRequest(loginRequest);
+        sendLoginRequest(userSciper, new Uint8Array([]));
 }

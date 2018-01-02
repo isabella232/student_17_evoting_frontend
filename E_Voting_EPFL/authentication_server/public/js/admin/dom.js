@@ -126,7 +126,7 @@ function createCenteredDiv(id){
 	var element = document.createElement("div");
 	element.id = id;
 	element.style.textAlign = "left";
-	element.style.width = "30%";
+	element.style.width = "40%";
 	element.style.margin = "0 auto";
 	return element;
 }

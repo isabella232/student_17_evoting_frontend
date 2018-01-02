@@ -59,16 +59,17 @@ function showNavConnected(){
 * Inject a welcome text when a client arrives unlogged on the web page.
 */
 function displayWelcomePage(){
-	$("#div1").append(paragraph(""));
-	$("#div1").append(h3("Welcome to the admin part of the EPFL E-Voting application !"));
-	$("#div1").append(paragraph("This application allows you to create elections and manage the one you already created"));
-	$("#div1").append(paragraph("while ensuring you security and authenticity.")); 
-	$("#div1").append(paragraph("To see your elections and create some new ones, please login."));
-	$("#div1").append("<form>");
-	$("#div1").append(paragraph("Sciper :"));
-	$("#div1").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
-	$("#div1").append("</form>");
-	$("#div1").append(clickableElement("button", "Login", function(){
+	$("#div1").append(createCenteredDiv("center"));
+	$("#center").append(paragraph(""));
+	$("#center").append(h3("Welcome to the admin part of the EPFL E-Voting application !"));
+	$("#center").append(paragraph("This application allows you to create elections and manage the one you already created"));
+	$("#center").append(paragraph("while ensuring you security and authenticity.")); 
+	$("#center").append(paragraph("To see your elections and create some new ones, please login."));
+	$("#center").append("<form>");
+	$("#center").append(paragraph("Sciper :"));
+	$("#center").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
+	$("#center").append("</form>");
+	$("#center").append(clickableElement("button", "Login", function(){
 		//authenticate();
 		// Mocking authentication waiting to turn in HTTPS.
 		var sciper = $("input[type='text'][name='sciper']").val();
@@ -78,7 +79,7 @@ function displayWelcomePage(){
 			$("#errDiv").append(paragraph("Incorrect SCIPER, please enter a valid one."));
 		}
 		}));
-	$("#div1").append(h4("Be aware that an admin account is required to access this page"));
+	$("#center").append(h4("Be aware that an admin account is required to access this page"));
 }
 
 

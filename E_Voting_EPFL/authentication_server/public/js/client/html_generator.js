@@ -40,17 +40,18 @@ function showNavConnected(){
 * Inject a welcome text when a client arrives unlogged on the web page.
 */
 function displayWelcomePage(){
-	$("#div1").append(paragraph(""));
-	$("#div1").append(h3("Welcome to the EPFL E-Voting application !"));
-	$("#div1").append(paragraph("This application allows you to vote for EPFL's elections"));
-	$("#div1").append(paragraph("while ensuring you security and authenticity.")); 
-	$("#div1").append(paragraph("To see the elections available, please login."));
-	$("#div1").append("<form>");
+	$("#div1").append(createCenteredDiv("center"));
+	$("#center").append(paragraph(""));
+	$("#center").append(h3("Welcome to the EPFL E-Voting application !"));
+	$("#center").append(paragraph("This application allows you to vote for EPFL's elections"));
+	$("#center").append(paragraph("while ensuring you security and authenticity.")); 
+	$("#center").append(paragraph("To see the elections available, please login."));
+	$("#center").append("<form>");
 	/* Enter sciper to mock the authentication. Have to be removed in later version of the application. */
-	$("#div1").append(paragraph("Sciper :"));
-	$("#div1").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
-	$("#div1").append("</form>");
-	$("#div1").append(clickableElement("button", "Login", function(){
+	$("#center").append(paragraph("Sciper :"));
+	$("#center").append("<input type='text' name='sciper' placeholder='XXXXXX'><br><br>");
+	$("#center").append("</form>");
+	$("#center").append(clickableElement("button", "Login", function(){
 			//authenticate();
 			/* Mocking authentication waiting to turn into HTTPS. */
 			var sciper = $("input[type='text'][name='sciper']").val();
@@ -302,7 +303,7 @@ function displayElectionResult(election, ballots){
 	for(var i = 0 ; i < pairArray.length; i++){
 		displayedArray[i] = {recid: (i + 1), sciper: pairArray[i].key, votes: pairArray[i].value};
 	}
-
+	$("#div2").append(createCenteredDiv("grid_details"));
 	generateResultGrid(displayedArray);
 	
 }
@@ -331,6 +332,7 @@ function displayBallotBox(box){
 	}
 	/* End type check. */
 
+	$("#div2").append(createCenteredDiv("grid_details"));
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){
 		var ballot = box[i];
@@ -375,6 +377,7 @@ function displayShuffledBox(box){
 	}
 	/* End type check. */
 
+	$("#div2").append(createCenteredDiv("grid_details"));
 	var numberedBallots = [];
 	for(var i = 0; i < box.length; i++){
 		var ballot = box[i];
