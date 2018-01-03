@@ -270,6 +270,8 @@ function displayElectionResult(election, ballots){
 	
 	/* Computes the results from the given ballots. */
 
+	$("#div2").append(createCenteredDiv("grid_details"));
+
 	var participants = uint8ArrayToScipers(election.data);
 
 	var pairArray = [];
@@ -303,7 +305,7 @@ function displayElectionResult(election, ballots){
 	for(var i = 0 ; i < pairArray.length; i++){
 		displayedArray[i] = {recid: (i + 1), sciper: pairArray[i].key, votes: pairArray[i].value};
 	}
-	$("#div2").append(createCenteredDiv("grid_details"));
+	
 	generateResultGrid(displayedArray);
 	
 }
