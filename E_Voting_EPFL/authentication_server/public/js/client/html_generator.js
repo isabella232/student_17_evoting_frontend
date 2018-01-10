@@ -282,20 +282,28 @@ function displayElectionResult(election, ballots){
 	for(var j = 0; j < ballots.length; j++){
 		var ballot = ballots[j];
 		var array = ballot.text;
-		var plain = array[0]+0x100*array[1]+0x10000*array[2];
 
-		if(ballot.user == userSciper){
-			$("#grid_details").append(paragraph("Your vote : "+plain)); 
-		}
+		if(typeof array != 'object' || array.length != 3){
+			/* 
+			* A problem happened during the encryption or during the storage, 
+			* an empty ballot have been casted, we ignore it.
+			*/
+		}else{
+			var plain = array[0]+0x100*array[1]+0x10000*array[2];
 
-		var index;
-		for(var i = 0; i < pairArray.length; i++){
-			if(pairArray[i].key == plain){
-				index = i;
+			if(ballot.user == userSciper){
+				$("#grid_details").append(paragraph("Your vote : "+plain)); 
 			}
+
+			var index;
+			for(var i = 0; i < pairArray.length; i++){
+				if(pairArray[i].key == plain){
+					index = i;
+				}
+			}
+			var tmp = pairArray[index].value;
+			pairArray[index] = {key: plain, value: tmp + 1};
 		}
-		var tmp = pairArray[index].value;
-		pairArray[index] = {key: plain, value: tmp + 1};
 	}
 
 	/* Sort the results in ascending order. */
