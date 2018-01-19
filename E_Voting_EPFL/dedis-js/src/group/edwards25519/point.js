@@ -54,11 +54,12 @@ Point.prototype._hexToUint8Array = function(hexString) {
  * @returns {string}
  */
 Point.prototype.toString = function() {
-  // return a little endian representation
-  return this.ref.point.getY().toArray('le').map(x => x.toString(16)).join('');
+  const bytes = this.ref.point.getY().toArray('le', 32);
+  return Array.from(bytes, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
 }
 
 Point.prototype.string = Point.prototype.toString;
+Point.prototype.inspect = Point.prototype.toString;
 
 /**
  * Tests for equality between two Points derived from the same group
