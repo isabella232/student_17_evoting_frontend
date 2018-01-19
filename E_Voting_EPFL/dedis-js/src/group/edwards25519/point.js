@@ -21,7 +21,11 @@ module.exports = Point;
  * @param {(number|Uint8Array)} T
  */
 function Point(X, Y, Z, T) {
-  this._point = ec.curve.point(X, Y, Z, T);
+  // the point reference is stored in an object to make set()
+  // consistent.
+  this.ref = {
+    point: ec.curve.point(X, Y, Z, T)
+  }
 }
 
 /**
@@ -51,7 +55,7 @@ Point.prototype._hexToUint8Array = function(hexString) {
  */
 Point.prototype.toString = function() {
   // return a little endian representation
-  return this._point.getY().toArray('le').map(x => x.toString(16)).join('');
+  return this.ref.point.getY().toArray('le').map(x => x.toString(16)).join('');
 }
 
 Point.prototype.string = Point.prototype.toString;
@@ -63,7 +67,7 @@ Point.prototype.string = Point.prototype.toString;
  * @returns {boolean}
  */
 Point.prototype.equal = function(p2) {
-  return this._point.eq(p2._point);
+  return this.ref.point.eq(p2.ref.point);
 }
 
 // Set point to be equal to p2
@@ -75,7 +79,7 @@ Point.prototype.equal = function(p2) {
  * @returns {object}
  */
 Point.prototype.set = function(p2) {
-  this._point = p2._point;
+  this.ref = p2.ref;
   return this;
 }
 
@@ -85,7 +89,7 @@ Point.prototype.set = function(p2) {
  * @returns {object} new Point object
  */
 Point.prototype.clone = function() {
-  return new Point(this._point.getX(), this._point.getY());
+  return new Point(this.ref.point.getX(), this.ref.point.getY());
 }
 
 /**
@@ -95,7 +99,7 @@ Point.prototype.clone = function() {
  * @returns {object}
  */
 Point.prototype.null = function() {
-  this._point = ec.curve.point(0, 1, 1, 0);
+  this.ref.point = ec.curve.point(0, 1, 1, 0);
   return this;;
 }
 
@@ -108,7 +112,7 @@ Point.prototype.base = function() {
   let x_arr = this._hexToUint8Array(basepoint.x);
   let y_arr = this._hexToUint8Array(basepoint.y);
 
-  this._point = ec.curve.point(x_arr, y_arr)
+  this.ref.point = ec.curve.point(x_arr, y_arr)
   return this;
 }
 
@@ -140,7 +144,7 @@ Point.prototype.data = function() {
  * @returns {object} p1 + p2
  */
 Point.prototype.add = function(p1, p2) {
-  this._point = ec.curve.point(p1._point.getX(), p1._point.getY()).add(p2._point);
+  this.ref.point = ec.curve.point(p1.ref.point.getX(), p1.ref.point.getY()).add(p2.ref.point);
   return this;
 }
 
@@ -152,7 +156,7 @@ Point.prototype.add = function(p1, p2) {
  * @returns {object} p1 - p2
  */
 Point.prototype.sub = function(p1, p2) {
-  this._point = ec.curve.point(p1._point.getX(), p1._point.getY()).add(p2._point.neg());
+  this.ref.point = ec.curve.point(p1.ref.point.getX(), p1.ref.point.getY()).add(p2.ref.point.neg());
   return this;
 }
 
@@ -164,7 +168,7 @@ Point.prototype.sub = function(p1, p2) {
  * @returns {object} -p
  */
 Point.prototype.neg = function(p) {
-  this._point = p._point.neg();
+  this.ref.point = p.ref.point.neg();
   return this;
 }
 
