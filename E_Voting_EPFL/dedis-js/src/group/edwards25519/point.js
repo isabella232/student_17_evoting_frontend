@@ -1,6 +1,7 @@
 'use strict';
 
 const EdDSA = require('elliptic').eddsa;
+const BN = require('bn.js');
 const ec = new EdDSA('ed25519');
 
 const basepoint = {
@@ -13,23 +14,43 @@ module.exports = Point;
 /**
  * Represents a Point on the twisted edwards curve
  * (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
+ *
+ * The value of the parameters is expected in little endian form if being
+ * passed as a Uint8Array
  * @constructor
  *
- * @param {(number|Uint8Array)} X
- * @param {(number|Uint8Array)} Y
- * @param {(number|Uint8Array)} Z
- * @param {(number|Uint8Array)} T
+ * @param {(number|Uint8Array|BN.jsObject)} X
+ * @param {(number|Uint8Array|BN.jsObject)} Y
+ * @param {(number|Uint8Array|BN.jsObject)} Z
+ * @param {(number|Uint8Array|BN.jsObject)} T
  */
 function Point(X, Y, Z, T) {
+  let _X = X;
+  let _Y = Y;
+  let _Z = Z;
+  let _T = T;
+
+  if (X !== undefined && X.constructor === Uint8Array) {
+    _X = new BN(X, 16, 'le');
+  }
+  if (Y !== undefined && Y.constructor === Uint8Array) {
+    _Y = new BN(Y, 16, 'le');
+  }
+  if (Z !== undefined && Z.constructor === Uint8Array) {
+    _Z = new BN(Z, 16, 'le');
+  }
+  if (T !== undefined && T.constructor === Uint8Array) {
+    _T = new BN(T, 16, 'le');
+  }
   // the point reference is stored in an object to make set()
   // consistent.
   this.ref = {
-    point: ec.curve.point(X, Y, Z, T)
+    point: ec.curve.point(_X, _Y, _Z, _T)
   }
 }
 
 /**
- * Returns the big endian represenation of a hex string
+ * Returns the little endian represenation of a hex string
  * as a Uint8Array
  * @private
  *
@@ -44,7 +65,7 @@ Point.prototype._hexToUint8Array = function(hexString) {
   let prefixRemoved = hexString.replace(/^0x/i, '');
   return new Uint8Array(Math.ceil(prefixRemoved.length / 2)).map((element, idx) => {
     return parseInt(prefixRemoved.substr(idx * 2, 2), 16);
-  });
+  }).reverse();
 }
 
 /**
@@ -114,7 +135,7 @@ Point.prototype.base = function() {
   let x_arr = this._hexToUint8Array(basepoint.x);
   let y_arr = this._hexToUint8Array(basepoint.y);
 
-  this.ref.point = ec.curve.point(x_arr, y_arr)
+  this.ref.point = ec.curve.point(new BN(x_arr, 16, 'le'), new BN(y_arr, 16, 'le'));
   return this;
 }
 
@@ -184,4 +205,8 @@ Point.prototype.neg = function(p) {
  */
 Point.prototype.mul = function(s) {
   // TODO after implementing scalar
+}
+
+Point.prototype.pick = function() {
+  // TODO
 }

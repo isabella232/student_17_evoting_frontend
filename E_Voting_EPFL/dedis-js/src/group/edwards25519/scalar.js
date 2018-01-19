@@ -6,8 +6,16 @@ const P = '0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed';
 
 // RED is constant because reduction operatiosn require the same instance
 // across operations
-const RED = BN.red(new BN(_hexToUint8Array(P), 16));
+const RED = BN.red(new BN(_hexToUint8Array(P), 16, 'le'));
 
+/**
+ * Returns the little endian represenation of a hex string
+ * as a Uint8Array
+ * @private
+ *
+ * @param {string} hexString The hexstring to convert
+ * @returns {Uint8Array}
+ */
 function _hexToUint8Array(hexString) {
   if (typeof hexString !== 'string') {
     throw new TypeError;
@@ -16,7 +24,7 @@ function _hexToUint8Array(hexString) {
   let prefixRemoved = hexString.replace(/^0x/i, '');
   return new Uint8Array(Math.ceil(prefixRemoved.length / 2)).map((element, idx) => {
     return parseInt(prefixRemoved.substr(idx * 2, 2), 16);
-  });
+  }).reverse();
 }
 
 module.exports = Scalar;
@@ -58,7 +66,7 @@ Scalar.prototype.set = function(a) {
  * @returns {object}
  */
 Scalar.prototype.clone = function() {
-  return new Scalar().setBytes(new Uint8Array(this.ref.arr.fromRed().toArray('be')));
+  return new Scalar().setBytes(new Uint8Array(this.ref.arr.fromRed().toArray('le')));
 }
 
 /**
@@ -152,7 +160,7 @@ Scalar.prototype.inv = function(a) {
 }
 
 /**
- * Sets the scalar from big-endian Uint8Array
+ * Sets the scalar from little-endian Uint8Array
  * and reduces to the appropriate modulus
  * @param b
  *
@@ -163,7 +171,7 @@ Scalar.prototype.setBytes = function(b) {
   if (b.constructor !== Uint8Array) {
     throw new TypeError;
   }
-  this.ref.arr = new BN(b, 16, 'be').toRed(RED);
+  this.ref.arr = new BN(b, 16, 'le').toRed(RED);
   return this;
 }
 
