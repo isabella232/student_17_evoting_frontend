@@ -1,6 +1,7 @@
 'use strict';
 
 const BN = require('bn.js');
+const crypto = require('crypto');
 const P = '0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed';
 
 // RED is constant because reduction operatiosn require the same instance
@@ -178,6 +179,18 @@ Scalar.prototype.bytes = function() {
 Scalar.prototype.toString = function() {
   let bytes = this.ref.arr.fromRed().toArray('le', 32);
   return Array.from(bytes, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
+}
+
+/**
+ * Set to a random scalar
+ *
+ * @returns {undefined}
+ */
+Scalar.prototype.pick = function() {
+  let buff = crypto.randomBytes(32);
+  let bytes = Uint8Array.from(buff);
+  this.setBytes(bytes);
+  return this;
 }
 
 Scalar.prototype.inspect = Scalar.prototype.toString;
