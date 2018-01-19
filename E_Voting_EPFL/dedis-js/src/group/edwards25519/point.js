@@ -89,7 +89,8 @@ Point.prototype.set = function(p2) {
  * @returns {object} new Point object
  */
 Point.prototype.clone = function() {
-  return new Point(this.ref.point.getX(), this.ref.point.getY());
+  const point = this.ref.point;
+  return new Point(point.x, point.y, point.z, point.t);
 }
 
 /**
@@ -144,7 +145,8 @@ Point.prototype.data = function() {
  * @returns {object} p1 + p2
  */
 Point.prototype.add = function(p1, p2) {
-  this.ref.point = ec.curve.point(p1.ref.point.getX(), p1.ref.point.getY()).add(p2.ref.point);
+  const point = p1.ref.point;
+  this.ref.point = ec.curve.point(point.x, point.y, point.z, point.t).add(p2.ref.point);
   return this;
 }
 
@@ -156,7 +158,8 @@ Point.prototype.add = function(p1, p2) {
  * @returns {object} p1 - p2
  */
 Point.prototype.sub = function(p1, p2) {
-  this.ref.point = ec.curve.point(p1.ref.point.getX(), p1.ref.point.getY()).add(p2.ref.point.neg());
+  const point = p1.ref.point;
+  this.ref.point = ec.curve.point(point.x, point.y, point.z, point.t).add(p2.ref.point.neg());
   return this;
 }
 
