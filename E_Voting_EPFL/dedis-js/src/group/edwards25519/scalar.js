@@ -2,30 +2,14 @@
 
 const BN = require('bn.js');
 const crypto = require('crypto');
+const utils = require('./utils');
 const P = '0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed';
 
-// RED is constant because reduction operatiosn require the same instance
+const PFSCALAR = new BN(utils.hexToUint8Array(P), 16, 'le');
+
+// RED is constant because reduction operations require the same instance
 // across operations
-const RED = BN.red(new BN(_hexToUint8Array(P), 16, 'le'));
-
-/**
- * Returns the little endian represenation of a hex string
- * as a Uint8Array
- * @private
- *
- * @param {string} hexString The hexstring to convert
- * @returns {Uint8Array}
- */
-function _hexToUint8Array(hexString) {
-  if (typeof hexString !== 'string') {
-    throw new TypeError;
-  }
-
-  let prefixRemoved = hexString.replace(/^0x/i, '');
-  return new Uint8Array(Math.ceil(prefixRemoved.length / 2)).map((element, idx) => {
-    return parseInt(prefixRemoved.substr(idx * 2, 2), 16);
-  }).reverse();
-}
+const RED = BN.red(PFSCALAR);
 
 module.exports = Scalar;
 
@@ -72,7 +56,7 @@ Scalar.prototype.clone = function() {
 /**
  * Set to the additive identity (0)
  *
- * @returns {undefined}
+ * @returns {object}
  */
 Scalar.prototype.zero = function() {
   this.ref.arr = new BN(0, 16).toRed(RED);
@@ -192,7 +176,7 @@ Scalar.prototype.toString = function() {
 /**
  * Set to a random scalar
  *
- * @returns {undefined}
+ * @returns {object}
  */
 Scalar.prototype.pick = function() {
   let buff = crypto.randomBytes(32);

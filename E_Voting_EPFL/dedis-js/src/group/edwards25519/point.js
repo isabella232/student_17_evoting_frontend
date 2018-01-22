@@ -3,11 +3,17 @@
 const EdDSA = require('elliptic').eddsa;
 const BN = require('bn.js');
 const ec = new EdDSA('ed25519');
+const crypto = require('crypto');
+const utils = require('./utils');
 
 const basepoint = {
   x: '0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a',
   y: '0x6666666666666666666666666666666666666666666666666666666666666658',
 };
+
+const P = '0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed';
+const PFSCALAR = new BN(utils.hexToUint8Array(P), 16, 'le');
+
 
 module.exports = Point;
 
@@ -47,25 +53,6 @@ function Point(X, Y, Z, T) {
   this.ref = {
     point: ec.curve.point(_X, _Y, _Z, _T)
   }
-}
-
-/**
- * Returns the little endian represenation of a hex string
- * as a Uint8Array
- * @private
- *
- * @param {string} hexString The hexstring to convert
- * @returns {Uint8Array}
- */
-Point.prototype._hexToUint8Array = function(hexString) {
-  if (typeof hexString !== 'string') {
-    throw new TypeError;
-  }
-
-  let prefixRemoved = hexString.replace(/^0x/i, '');
-  return new Uint8Array(Math.ceil(prefixRemoved.length / 2)).map((element, idx) => {
-    return parseInt(prefixRemoved.substr(idx * 2, 2), 16);
-  }).reverse();
 }
 
 /**
@@ -132,8 +119,8 @@ Point.prototype.null = function() {
  * @returns {object}
  */
 Point.prototype.base = function() {
-  let x_arr = this._hexToUint8Array(basepoint.x);
-  let y_arr = this._hexToUint8Array(basepoint.y);
+  let x_arr = utils.hexToUint8Array(basepoint.x);
+  let y_arr = utils.hexToUint8Array(basepoint.y);
 
   this.ref.point = ec.curve.point(new BN(x_arr, 16, 'le'), new BN(y_arr, 16, 'le'));
   return this;
@@ -151,12 +138,80 @@ Point.prototype.embedLen = function() {
   return Math.floor((255 - 8 - 8) / 8);
 }
 
-Point.prototype.embed = function() {
-  // TODO after implementing mul
+/**
+ * Returns a Point with data embedded in the y coordinate
+ *
+ * @param {Uint8Array} data to embed with length <= embedLen
+ *
+ * @throws {TypeError} if data is not Uint8Array
+ * @throws {Error} if data.length > embedLen
+ * @returns {object}
+ */
+Point.prototype.embed = function(data) {
+  if (data.constructor !== Uint8Array) {
+    throw TypeError;
+  }
+
+  let dl = this.embedLen();
+  if (data.length > dl) {
+    throw Error;
+  }
+
+  if (dl > data.length) {
+    dl = data.length;
+  }
+
+  let point_obj  = new Point();
+  let epoint;
+  while(true) {
+    let buff = crypto.randomBytes(32);
+    let bytes = Uint8Array.from(buff);
+
+    if (dl > 0) {
+      bytes[0] = dl; // encode length in lower 8 bits
+      bytes.set(data, 1) // copy in data to embed
+    }
+
+    let bnp = new BN(bytes, 16, 'le');
+
+    if (bnp.cmp(PFSCALAR) > 0) {
+      continue; // try again
+    }
+
+    try {
+      epoint = ec.curve.pointFromY(bnp);
+      point_obj.ref.point = epoint;
+    } catch(e) {
+      continue; // try again
+    }
+    if (dl == 0) {
+      if (point_obj.equal(null_point)) {
+        continue; // unlucky
+      }
+      return point_obj;
+    }
+
+    let q = new Point();
+    q.mul(PFSCALAR, point_obj);
+    if (q.equal(null_point)) {
+      return point_obj;
+    }
+  }
 }
 
+/**
+ * Extract embedded data from a point
+ *
+ * @throws {Error} when length of embedded data > embedLen
+ * @returns {Uint8Array}
+ */
 Point.prototype.data = function() {
-  // TODO
+  const bytes = this.ref.point.getY().toArray('le', 32);
+  const dl = bytes[0];
+  if (dl > this.embedLen()) {
+    throw Error;
+  }
+  return bytes.slice(1, dl + 1);
 }
 
 /**
@@ -198,15 +253,25 @@ Point.prototype.neg = function(p) {
 }
 
 /**
- * mul Multiplies a point with a scalar s
+ * Multiply point p by scalar s
  *
- * @param {object} s scalar
- * @returns {object} Point sP
+ * @param {object} s Scalar
+ * @param {object} p Point
+ * @returns {object}
  */
-Point.prototype.mul = function(s) {
-  // TODO after implementing scalar
+Point.prototype.mul = function(s, p) {
+  this.ref.point = p.ref.point.mul(s);
+  return this;
 }
 
+/**
+ * Selects a random point
+ *
+ * @returns {object}
+ */
 Point.prototype.pick = function() {
-  // TODO
+  return this.embed(new Uint8Array());
 }
+
+
+const null_point = new Point().null();
