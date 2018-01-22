@@ -165,7 +165,7 @@ Scalar.prototype.setBytes = function(b) {
  * @returns {Uint8Array}
  */
 Scalar.prototype.bytes = function() {
-  return this.ref.arr.fromRed().toArray('be', 32);
+  return new Uint8Array(this.ref.arr.fromRed().toArray('be', 32));
 }
 
 Scalar.prototype.toString = function() {
@@ -187,3 +187,33 @@ Scalar.prototype.pick = function() {
 
 Scalar.prototype.inspect = Scalar.prototype.toString;
 Scalar.prototype.string = Scalar.prototype.toString;
+
+Scalar.prototype.marshalSize = function() {
+  return 32;
+}
+
+/**
+ * Returns the binary representation (little endian) of the scalar
+ *
+ * @returns {Uint8Array}
+ */
+Scalar.prototype.marshalBinary = function() {
+  return new Uint8Array(this.ref.arr.fromRed().toArray('le', 32));
+}
+
+/**
+ * Reads the binary representation (little endian) of scalar
+ *
+ * @param bytes
+ * @returns {undefined}
+ */
+Scalar.prototype.unmarshalBinary = function(bytes) {
+  if (bytes.constructor !== Uint8Array) {
+    throw TypeError;
+  }
+
+  if (bytes.length !== this.marshalSize()) {
+    throw Error;
+  }
+  this.setBytes(bytes);
+}

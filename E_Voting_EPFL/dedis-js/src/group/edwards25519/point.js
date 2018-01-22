@@ -11,9 +11,9 @@ const basepoint = {
   y: '0x6666666666666666666666666666666666666666666666666666666666666658',
 };
 
+// 2^252 + 27742317777372353535851937790883648493)
 const P = '0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed';
 const PFSCALAR = new BN(utils.hexToUint8Array(P), 16, 'le');
-
 
 module.exports = Point;
 
@@ -62,7 +62,7 @@ function Point(X, Y, Z, T) {
  * @returns {string}
  */
 Point.prototype.toString = function() {
-  const bytes = this.ref.point.getY().toArray('le', 32);
+  const bytes = this.marshalBinary();
   return Array.from(bytes, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
 }
 
@@ -77,6 +77,14 @@ Point.prototype.inspect = Point.prototype.toString;
  */
 Point.prototype.equal = function(p2) {
   return this.ref.point.eq(p2.ref.point);
+  const b1 = this.marshalBinary();
+  const b2 = this.marshalBinary();
+  for (var i = 0; i < 32; i++) {
+    if (b1[i] !== b2[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Set point to be equal to p2
@@ -162,7 +170,6 @@ Point.prototype.embed = function(data) {
   }
 
   let point_obj  = new Point();
-  let epoint;
   while(true) {
     let buff = crypto.randomBytes(32);
     let bytes = Uint8Array.from(buff);
@@ -179,8 +186,7 @@ Point.prototype.embed = function(data) {
     }
 
     try {
-      epoint = ec.curve.pointFromY(bnp);
-      point_obj.ref.point = epoint;
+      point_obj.unmarshalBinary(bytes);
     } catch(e) {
       continue; // try again
     }
@@ -206,7 +212,7 @@ Point.prototype.embed = function(data) {
  * @returns {Uint8Array}
  */
 Point.prototype.data = function() {
-  const bytes = this.ref.point.getY().toArray('le', 32);
+  const bytes = this.marshalBinary();
   const dl = bytes[0];
   if (dl > this.embedLen()) {
     throw Error;
@@ -271,6 +277,49 @@ Point.prototype.mul = function(s, p) {
  */
 Point.prototype.pick = function() {
   return this.embed(new Uint8Array());
+}
+
+Point.prototype.marshalSize = function() {
+  return 32;
+}
+
+/**
+ * Convert a ed25519 curve point into a byte representation
+ *
+ * @returns {Uint8Array} byte representation
+ */
+Point.prototype.marshalBinary = function() {
+  this.ref.point.normalize();
+
+  const buffer = this.ref.point.getY().toArray('le', 32);
+  buffer[31] ^= (this.ref.point.x.isOdd() ? 1 : 0) << 7;
+
+  return new Uint8Array(buffer);
+}
+
+/**
+ * Convert a Uint8Array back to a ed25519 curve point
+ * {@link tools.ietf.org/html/rfc8032#section-5.1.3}
+ * @param {Uint8Array} bytes
+ *
+ * @throws {TypeError} when bytes is not Uint8Array
+ * @throws {Error} when bytes does not correspond to a valid point
+ * @returns {object}
+ */
+Point.prototype.unmarshalBinary = function(bytes) {
+  if (bytes.constructor !== Uint8Array) {
+    throw new TypeError;
+  }
+
+  const odd = (bytes[31] >> 7) == 1;
+
+  bytes[31] &= 0x7F;
+  let bnp = new BN(bytes, 16, 'le');
+  if (bnp.cmp(ec.curve.p) >= 0) {
+    throw new Error
+  }
+  this.ref.point = ec.curve.pointFromY(new BN(bytes, 16, 'le'), odd);
+  return this;
 }
 
 
