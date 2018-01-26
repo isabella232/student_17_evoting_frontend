@@ -51,19 +51,28 @@ function Point(curve, X, Y, Z, T) {
 }
 
 /**
- * Returns the little endian representation of the y coordinate of
- * the Point
+ * Returns string representation of (x,y) with x and y as big endian hexstrings
  *
  * @return {string}
  */
 Point.prototype.toString = function() {
-  const bytes = this.marshalBinary();
-  return Array.from(bytes, b => ("0" + (b & 0xff).toString(16)).slice(-2)).join(
-    ""
+  const xBytes = this.ref.point.getX().toArray("be");
+  const yBytes = this.ref.point.getY().toArray("be");
+  return (
+    "(" +
+    Array.from(xBytes, b => ("0" + (b & 0xff).toString(16)).slice(-2)).join(
+      ""
+    ) +
+    ", " +
+    Array.from(yBytes, b => ("0" + (b & 0xff).toString(16)).slice(-2)).join(
+      ""
+    ) +
+    ")"
   );
 };
 
 Point.prototype.string = Point.prototype.toString;
+
 Point.prototype.inspect = Point.prototype.toString;
 
 /**
@@ -73,15 +82,9 @@ Point.prototype.inspect = Point.prototype.toString;
  * @return {boolean}
  */
 Point.prototype.equal = function(p2) {
-  return this.ref.point.eq(p2.ref.point);
-  const b1 = this.marshalBinary();
-  const b2 = this.marshalBinary();
-  for (let i = 0; i < this.ref.curve.pointLen(); i++) {
-    if (b1[i] !== b2[i]) {
-      return false;
-    }
-  }
-  return true;
+  let xeq = this.ref.point.x.redMul(p2.ref.point.z).cmp(p2.ref.point.x.redMul(this.ref.point.z)) == 0;
+  let yeq = this.ref.point.y.redMul(p2.ref.point.z).cmp(p2.ref.point.y.redMul(this.ref.point.z)) == 0;
+  return xeq && yeq;
 };
 
 // Set point to be equal to p2
@@ -124,7 +127,7 @@ Point.prototype.null = function() {
  */
 Point.prototype.base = function() {
   this.ref.point = this.ref.curve.curve.point(
-    this.ref.curve.g.getX(),
+    this.ref.curve.curve.g.getX(),
     this.ref.curve.curve.g.getY()
   );
   return this;
