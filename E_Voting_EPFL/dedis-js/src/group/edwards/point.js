@@ -108,13 +108,12 @@ Point.prototype.clone = function() {
 };
 
 /**
- * Set to the neutral element, which is (0, 1) for twisted Edwards
- * Curve
+ * Set to the neutral element, which is (0, c) for Edwards Curve
  *
  * @return {module:group/edwards~Point}
  */
 Point.prototype.null = function() {
-  this.ref.point = this.ref.curve.curve.point(0, 1, 1, 0);
+  this.ref.point = this.ref.curve.curve.point(0, this.ref.curve.curve.c);
   return this;
 };
 
