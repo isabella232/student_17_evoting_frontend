@@ -76,7 +76,6 @@ Point.prototype.inspect = Point.prototype.toString;
  * @returns {boolean}
  */
 Point.prototype.equal = function(p2) {
-  return this.ref.point.eq(p2.ref.point);
   const b1 = this.marshalBinary();
   const b2 = this.marshalBinary();
   for (var i = 0; i < 32; i++) {

@@ -28,8 +28,7 @@ class Weierstrass {
    * @constructor
    */
   constructor(config) {
-    let name, bitSize, gx, gy, options
-    ({ name, bitSize, gx, gy, ...options } = config);
+    let { name, bitSize, gx, gy, ...options } = config;
     this.name = name;
     options["g"] = [new BN(gx, 16, "le"), new BN(gy, 16, "le")];
     for (let k in options) {
